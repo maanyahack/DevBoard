@@ -1,0 +1,22 @@
+{
+  "name": "devboard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DevBoard - a developer productivity platform (monorepo root).",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./client\" --filter \"./server\" dev",
+    "dev:client": "pnpm --filter devboard-client dev",
+    "dev:server": "pnpm --filter devboard-server dev",
+    "build": "pnpm --filter devboard-client build && pnpm --filter devboard-server build",
+    "lint": "pnpm -r lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,css,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,json,css,md}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  }
+}

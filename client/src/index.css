@@ -1,0 +1,28 @@
+@import 'tailwindcss';
+
+/* Tailwind v4 configures dark mode in CSS. We use a class strategy so the
+   Settings page can toggle it by adding/removing `dark` on <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+/* Subtle graph-paper texture for the landing hero. */
+.bg-dot-grid {
+  background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+  background-size: 22px 22px;
+}
