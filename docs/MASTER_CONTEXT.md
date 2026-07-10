@@ -446,18 +446,17 @@ Bypasses client visibility:
 - Validation patterns inside pages referencing Zod and React Hook Form.
 - Express server configuration: setup of route mapping, centralized error handler middleware, and user context verification checks.
 - Backend Notes CRUD endpoints (`GET /api/notes`, `POST /api/notes`, `PUT /api/notes/:id`, `DELETE /api/notes/:id`).
+- Frontend Notes UI connected to backend CRUD using authenticated Bearer token requests.
 
 ### Pending Features
-- Frontend client network logic (the frontend currently does not perform any HTTP requests to the backend server).
-- Implementing UI components for Notes module (presently a `ModulePlaceholder`).
 - Implementing UI/Backend components for Tasks, Projects, Bookmarks, Knowledge Vault, and Snippets modules.
 - Deploying configuration files for production hosting.
 
 ### Current Milestone
-- Milestone 1: Establishing the core monorepo foundation, setting up authentication, layout styling, and verifying initial backend API routes.
+- Milestone 2: Notes Module.
 
 ### Current Task
-- Documenting the existing codebase for handoff to another AI assistant.
+- Task 2.5: Search, Pin, Categories.
 
 ---
 
@@ -490,8 +489,8 @@ Bypasses client visibility:
 
 ## 12. Known Issues
 
-- **Client-Server Disconnect:** No frontend component implements network requests targeting the backend server (VITE_API_URL is only typed, not used).
-- **Placeholder Modules:** Every core feature screen (Notes, Tasks, etc.) is a placeholder page.
+- **Notes Metadata Persistence:** The current database/API contract persists note `title` and `content`; category and pinned state are UI metadata until Task 2.5 adds schema/API support.
+- **Placeholder Modules:** Tasks, Projects, Bookmarks, Knowledge Vault, and Snippets remain placeholder pages.
 - **Metadata Identity Lockout:** The profile page saves updates to Supabase metadata attributes (`display_name`, `avatar_url`) directly, but the changes do not propagate to any user backend profile database tables.
 - **Local DB Schema:** The database contains no migrations or SQL schemas inside the repository files. Database schema mappings must be inferred from service data definitions.
 
@@ -541,15 +540,15 @@ Status: COMPLETE
 
 Status: COMPLETE
 
-### ⬜ Task 2.3
+### ✅ Task 2.3
 Frontend Notes UI
 
-Pending
+Status: COMPLETE
 
-### ⬜ Task 2.4
+### ✅ Task 2.4
 Connect frontend to backend
 
-Pending
+Status: COMPLETE
 
 ### ⬜ Task 2.5
 Search, Pin, Categories
@@ -643,13 +642,13 @@ Milestone 2
 
 Current Task
 
-Task 2.3
-Build the Notes frontend UI.
+Task 2.5
+Search, Pin, Categories.
 
 Next Task
 
-Task 2.4
-Connect Notes UI with backend CRUD API.
+Task 2.6
+Notes polish and UX improvements.
 
 ---
 

@@ -6,6 +6,7 @@ import type { Note, NoteEditableFields } from '@/features/notes/types';
 interface NoteModalProps {
   note?: Note | null;
   isOpen: boolean;
+  isSaving?: boolean;
   onClose: () => void;
   onSave: (fields: NoteEditableFields) => void;
 }
@@ -17,7 +18,7 @@ const emptyFields: NoteEditableFields = {
   isPinned: false,
 };
 
-export function NoteModal({ note, isOpen, onClose, onSave }: NoteModalProps) {
+export function NoteModal({ note, isOpen, isSaving = false, onClose, onSave }: NoteModalProps) {
   const [fields, setFields] = useState<NoteEditableFields>(emptyFields);
   const [titleError, setTitleError] = useState('');
 
@@ -146,10 +147,12 @@ export function NoteModal({ note, isOpen, onClose, onSave }: NoteModalProps) {
           </div>
 
           <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end dark:border-slate-700">
-            <Button type="button" variant="secondary" onClick={onClose}>
+            <Button type="button" variant="secondary" onClick={onClose} disabled={isSaving}>
               Cancel
             </Button>
-            <Button type="submit">{note ? 'Save changes' : 'Create note'}</Button>
+            <Button type="submit" isLoading={isSaving}>
+              {note ? 'Save changes' : 'Create note'}
+            </Button>
           </div>
         </form>
       </div>
