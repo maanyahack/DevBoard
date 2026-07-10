@@ -6,6 +6,7 @@ import ForgotPasswordPage from '@/pages/ForgotPasswordPage';
 import ResetPasswordPage from '@/pages/ResetPasswordPage';
 import DashboardPage from '@/pages/DashboardPage';
 import NotesPage from '@/pages/NotesPage';
+import TasksPage from '@/pages/TasksPage';
 import ProfilePage from '@/pages/ProfilePage';
 import SettingsPage from '@/pages/SettingsPage';
 import ModulePlaceholder from '@/pages/ModulePlaceholder';
@@ -55,7 +56,7 @@ export function AppRouter() {
       >
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/notes" element={<NotesPage />} />
-        <Route path="/tasks" element={<ModulePlaceholder title="Tasks" />} />
+        <Route path="/tasks" element={<TasksPage />} />
         <Route path="/projects" element={<ModulePlaceholder title="Projects" />} />
         <Route path="/bookmarks" element={<ModulePlaceholder title="Bookmarks" />} />
         <Route path="/knowledge" element={<ModulePlaceholder title="Knowledge Vault" />} />
