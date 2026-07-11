@@ -9,7 +9,7 @@ import { TaskModal } from '@/features/tasks/components/TaskModal';
 import { TaskSkeleton } from '@/features/tasks/components/TaskSkeleton';
 import type { Task, TaskEditableFields } from '@/features/tasks/types';
 
-const tasksQueryKey = ['tasks'], apiBaseUrl = import.meta.env.VITE_API_URL.replace(/\/$/, '');
+const dashboardQueryKey = ['dashboard'], tasksQueryKey = ['tasks'], apiBaseUrl = import.meta.env.VITE_API_URL.replace(/\/$/, '');
 
 interface TasksResponse { tasks: Task[] }
 interface TaskResponse { task: Task }
@@ -79,6 +79,7 @@ export default function TasksPage() {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: tasksQueryKey });
+      void queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
       closeTaskModal();
     },
   });
@@ -92,6 +93,7 @@ export default function TasksPage() {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: tasksQueryKey });
+      void queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
       closeTaskModal();
     },
   });
@@ -105,6 +107,7 @@ export default function TasksPage() {
     onSuccess: () => {
       setDeletingTask(null);
       void queryClient.invalidateQueries({ queryKey: tasksQueryKey });
+      void queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
     },
   });
 

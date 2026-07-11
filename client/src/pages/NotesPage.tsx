@@ -8,6 +8,7 @@ import { NoteModal } from '@/features/notes/components/NoteModal';
 import type { Note, NoteEditableFields } from '@/features/notes/types';
 
 const allCategoriesLabel = 'All categories';
+const dashboardQueryKey = ['dashboard'];
 const notesQueryKey = ['notes'];
 const apiBaseUrl = import.meta.env.VITE_API_URL.replace(/\/$/, '');
 
@@ -143,6 +144,7 @@ export default function NotesPage() {
         },
       }));
       void queryClient.invalidateQueries({ queryKey: notesQueryKey });
+      void queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
       closeModal();
     },
   });
@@ -173,6 +175,7 @@ export default function NotesPage() {
         },
       }));
       void queryClient.invalidateQueries({ queryKey: notesQueryKey });
+      void queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
       closeModal();
     },
   });
@@ -196,6 +199,7 @@ export default function NotesPage() {
         return next;
       });
       void queryClient.invalidateQueries({ queryKey: notesQueryKey });
+      void queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
     },
   });
 

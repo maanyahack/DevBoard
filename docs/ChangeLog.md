@@ -21,3 +21,21 @@
 
 - Search
 - Pin notes
+
+# Changelog
+
+## v0.5
+
+### Added
+- Complete Projects module
+- Dashboard with statistics
+- Recent Tasks widget
+- Recent Notes widget
+- Active Projects widget
+- Quick Actions
+- Dashboard backend aggregation endpoint
+
+### Improved
+- React Query integration across modules
+- Authentication consistency
+
