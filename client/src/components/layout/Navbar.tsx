@@ -7,11 +7,11 @@ interface NavbarProps {
 export function Navbar({ onMenuClick }: NavbarProps) {
   return (
     <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/80 backdrop-blur dark:border-slate-700 dark:bg-slate-800/80">
-      <div className="flex h-16 items-center gap-4 px-4 sm:px-6">
+      <div className="flex h-16 items-center gap-3 px-4 sm:gap-4 sm:px-6">
         {/* Mobile menu toggle */}
         <button
           onClick={onMenuClick}
-          className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden dark:text-slate-300 dark:hover:bg-slate-700"
+          className="rounded-lg p-2 text-slate-600 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white lg:hidden dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100 dark:focus-visible:ring-offset-slate-800"
           aria-label="Open sidebar"
         >
           <svg
@@ -43,14 +43,14 @@ export function Navbar({ onMenuClick }: NavbarProps) {
           <input
             type="search"
             placeholder="Search…"
-            className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm text-slate-700 outline-none transition focus:border-indigo-300 focus:bg-white focus:ring-2 focus:ring-indigo-200 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200 dark:focus:bg-slate-700"
+            className="w-full rounded-lg border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm text-slate-700 shadow-sm outline-none transition-colors duration-150 placeholder:text-slate-400 focus:border-indigo-300 focus:bg-white focus:ring-2 focus:ring-indigo-200/70 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-200 dark:placeholder:text-slate-500 dark:focus:border-indigo-400/50 dark:focus:bg-slate-700 dark:focus:ring-indigo-500/25"
           />
         </div>
 
-        <div className="ml-auto flex items-center gap-1 sm:gap-2">
+        <div className="ml-auto flex items-center gap-0.5 sm:gap-1.5">
           {/* Notifications (UI only) */}
           <button
-            className="relative rounded-lg p-2 text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
+            className="relative rounded-lg p-2 text-slate-600 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100 dark:focus-visible:ring-offset-slate-800"
             aria-label="Notifications"
           >
             <svg
@@ -65,7 +65,7 @@ export function Navbar({ onMenuClick }: NavbarProps) {
               <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
               <path d="M13.7 21a2 2 0 0 1-3.4 0" />
             </svg>
-            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-indigo-500" />
+            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-indigo-500 ring-2 ring-white dark:ring-slate-800" />
           </button>
 
           <ProfileDropdown />

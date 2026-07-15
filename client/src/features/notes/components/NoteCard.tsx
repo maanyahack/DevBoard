@@ -17,20 +17,20 @@ function formatDate(value: string): string {
 
 export function NoteCard({ note, onEdit, onDelete, onTogglePinned }: NoteCardProps) {
   return (
-    <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:border-slate-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600">
+    <article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-150 hover:border-slate-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600 dark:hover:shadow-black/20">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-teal-50 px-2.5 py-1 text-xs font-medium text-teal-700 dark:bg-teal-400/10 dark:text-teal-300">
+            <span className="inline-flex items-center rounded-full bg-teal-50 px-2.5 py-0.5 text-xs font-medium text-teal-700 ring-1 ring-inset ring-teal-600/10 dark:bg-teal-400/10 dark:text-teal-300 dark:ring-teal-400/20">
               {note.category}
             </span>
             {note.isPinned && (
-              <span className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 dark:bg-amber-400/10 dark:text-amber-300">
+              <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/10 dark:bg-amber-400/10 dark:text-amber-300 dark:ring-amber-400/20">
                 Pinned
               </span>
             )}
           </div>
-          <h2 className="mt-3 line-clamp-2 text-base font-semibold text-slate-900 dark:text-slate-100">
+          <h2 className="mt-3 line-clamp-2 text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100">
             {note.title}
           </h2>
         </div>
@@ -38,7 +38,7 @@ export function NoteCard({ note, onEdit, onDelete, onTogglePinned }: NoteCardPro
         <button
           type="button"
           onClick={() => onTogglePinned(note.id)}
-          className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-amber-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:bg-slate-700 dark:hover:text-amber-300"
+          className="rounded-lg p-2 text-slate-400 transition-colors duration-150 hover:bg-slate-100 hover:text-amber-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:hover:bg-slate-700 dark:hover:text-amber-300 dark:focus-visible:ring-offset-slate-800"
           aria-label={note.isPinned ? 'Unpin note' : 'Pin note'}
           title={note.isPinned ? 'Unpin note' : 'Pin note'}
         >
@@ -70,14 +70,14 @@ export function NoteCard({ note, onEdit, onDelete, onTogglePinned }: NoteCardPro
           <button
             type="button"
             onClick={() => onEdit(note)}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+            className="rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white dark:focus-visible:ring-offset-slate-800"
           >
             Edit
           </button>
           <button
             type="button"
             onClick={() => onDelete(note.id)}
-            className="rounded-lg px-3 py-1.5 text-sm font-medium text-red-600 transition hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 dark:text-red-400 dark:hover:bg-red-500/10"
+            className="rounded-lg px-3 py-1.5 text-sm font-medium text-red-600 transition-colors duration-150 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:text-red-400 dark:hover:bg-red-500/10 dark:focus-visible:ring-offset-slate-800"
           >
             Delete
           </button>
