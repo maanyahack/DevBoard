@@ -1,6 +1,6 @@
 # MASTER_CONTEXT.md
 
-This document serves as a comprehensive handoff file containing factual developer-level context and architecture details of the DevBoard project.
+This document serves as a comprehensive handoff file containing factual developer-level context and architecture details of the DevNest project.
 
 ---
 
@@ -753,7 +753,7 @@ Every response should finish with:
 
 # 17. Design Philosophy
 
-DevBoard should feel like a modern SaaS product.
+DevNest should feel like a modern SaaS product.
 
 Design inspiration:
 

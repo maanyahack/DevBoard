@@ -25,11 +25,11 @@ export default function LoginPage() {
   return (
     <AuthLayout
       title="Welcome back"
-      subtitle="Log in to your DevBoard account"
+      subtitle="Log in to your DevNest account"
       footer={
         <>
           Don&apos;t have an account?{' '}
-          <Link to="/signup" className="font-medium text-indigo-600 hover:text-indigo-700">
+          <Link to="/signup" className="font-medium text-emerald-600 hover:text-emerald-700">
             Sign up
           </Link>
         </>
@@ -57,7 +57,7 @@ export default function LoginPage() {
         <div className="flex justify-end">
           <Link
             to="/forgot-password"
-            className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+            className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
           >
             Forgot password?
           </Link>

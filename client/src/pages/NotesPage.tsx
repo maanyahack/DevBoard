@@ -329,7 +329,7 @@ export default function NotesPage() {
                 id="notes-category"
                 value={selectedCategory}
                 onChange={(event) => setSelectedCategory(event.target.value)}
-                className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-indigo-300 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-100"
+                className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-300 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-100"
               >
                 {categories.map((category) => (
                   <option key={category} value={category}>

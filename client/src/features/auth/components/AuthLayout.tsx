@@ -14,10 +14,10 @@ export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProp
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12">
       <div className="w-full max-w-sm">
         <Link to="/" className="mb-8 flex items-center justify-center gap-2">
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">
-            DB
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600 text-base font-bold text-white">
+            ◈
           </span>
-          <span className="text-lg font-semibold text-slate-900">DevBoard</span>
+          <span className="text-lg font-semibold text-slate-900">DevNest</span>
         </Link>
         <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
           <h1 className="text-xl font-semibold text-slate-900">{title}</h1>

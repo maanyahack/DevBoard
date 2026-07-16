@@ -6,10 +6,10 @@ export function LandingNav() {
     <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/80 backdrop-blur">
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2">
-          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">
-            DB
+          <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-600 text-base font-bold text-white">
+            ◈
           </span>
-          <span className="text-base font-semibold text-slate-900">DevBoard</span>
+          <span className="text-base font-semibold text-slate-900">DevNest</span>
         </Link>
         <div className="hidden items-center gap-8 md:flex">
           <a href="#features" className="text-sm font-medium text-slate-600 transition hover:text-slate-900">

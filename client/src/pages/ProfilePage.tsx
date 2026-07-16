@@ -37,7 +37,7 @@ export default function ProfilePage() {
     <div className="mx-auto max-w-2xl">
       <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Profile</h1>
       <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-        Manage how you appear across DevBoard.
+        Manage how you appear across DevNest.
       </p>
 
       <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800 sm:p-8">
@@ -50,7 +50,7 @@ export default function ProfilePage() {
               className="h-16 w-16 rounded-full object-cover"
             />
           ) : (
-            <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-indigo-100 text-lg font-semibold text-indigo-700">
+            <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-lg font-semibold text-emerald-700">
               {initials}
             </span>
           )}

@@ -39,7 +39,7 @@ export default function SettingsPage() {
     <div className="mx-auto max-w-2xl">
       <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Settings</h1>
       <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-        Customize how DevBoard looks and feels.
+        Customize how DevNest looks and feels.
       </p>
 
       <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800 sm:p-8">
@@ -57,7 +57,7 @@ export default function SettingsPage() {
                 onClick={() => setTheme(option.value)}
                 className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${
                   isActive
-                    ? 'border-indigo-500 bg-indigo-50 dark:border-indigo-400 dark:bg-indigo-500/10'
+                    ? 'border-emerald-500 bg-emerald-50 dark:border-emerald-400 dark:bg-emerald-500/10'
                     : 'border-slate-200 hover:border-slate-300 dark:border-slate-700 dark:hover:border-slate-600'
                 }`}
                 aria-pressed={isActive}
@@ -65,7 +65,7 @@ export default function SettingsPage() {
                 <span
                   className={`inline-flex h-10 w-10 items-center justify-center rounded-lg ${
                     isActive
-                      ? 'bg-indigo-600 text-white'
+                      ? 'bg-emerald-600 text-white'
                       : 'bg-slate-100 text-slate-500 dark:bg-slate-700 dark:text-slate-300'
                   }`}
                 >

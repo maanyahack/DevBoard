@@ -81,14 +81,14 @@ export function FeatureSection() {
     <section id="features" className="bg-slate-50 py-20 sm:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="max-w-2xl">
-          <span className="font-mono text-xs font-medium tracking-wide text-indigo-600">
+          <span className="font-mono text-xs font-medium tracking-wide text-emerald-600">
             // what is inside
           </span>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-900">
             One board for everything you juggle.
           </h2>
           <p className="mt-3 text-slate-600">
-            Stop context-switching between six different apps. DevBoard keeps every part of your
+            Stop context-switching between six different apps. DevNest keeps every part of your
             workflow a keystroke away.
           </p>
         </div>
@@ -97,9 +97,9 @@ export function FeatureSection() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-indigo-200 hover:shadow-md"
+              className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-emerald-200 hover:shadow-md"
             >
-              <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+              <div className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
                 {feature.icon}
               </div>
               <h3 className="mt-4 text-base font-semibold text-slate-900">{feature.title}</h3>

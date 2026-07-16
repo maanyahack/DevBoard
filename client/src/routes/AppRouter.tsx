@@ -9,7 +9,7 @@ import NotesPage from '@/pages/NotesPage';
 import ProjectsPage from '@/pages/ProjectsPage';
 import TasksPage from '@/pages/TasksPage';
 import ProfilePage from '@/pages/ProfilePage';
-import SettingsPage from '@/pages/SettingsPage';
+
 import ModulePlaceholder from '@/pages/ModulePlaceholder';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
@@ -63,7 +63,7 @@ export function AppRouter() {
         <Route path="/knowledge" element={<ModulePlaceholder title="Knowledge Vault" />} />
         <Route path="/snippets" element={<ModulePlaceholder title="Snippets" />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/settings" element={<SettingsPage />} />
+
       </Route>
 
       {/* Fallback */}

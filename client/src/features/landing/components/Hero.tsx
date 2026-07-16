@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 
 const previewResults = [
-  { label: 'Note', title: 'Sprint planning notes', tint: 'text-indigo-600 bg-indigo-50' },
+  { label: 'Note', title: 'Sprint planning notes', tint: 'text-emerald-600 bg-emerald-50' },
   { label: 'Task', title: 'Fix auth redirect bug', tint: 'text-amber-600 bg-amber-50' },
   { label: 'Snippet', title: 'useDebounce.ts', tint: 'text-emerald-600 bg-emerald-50' },
 ];
@@ -52,14 +52,14 @@ export function Hero() {
     <section className="bg-dot-grid relative overflow-hidden bg-white">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:py-28">
         <div>
-          <span className="inline-block rounded-full border border-slate-200 bg-white px-3 py-1 font-mono text-xs font-medium text-indigo-600">
+          <span className="inline-block rounded-full border border-slate-200 bg-white px-3 py-1 font-mono text-xs font-medium text-emerald-600">
             Built for developers
           </span>
           <h1 className="mt-5 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
             Every note, task, and snippet — on one board.
           </h1>
           <p className="mt-5 max-w-lg text-lg text-slate-600">
-            DevBoard pulls the scattered pieces of your workflow — notes, tasks, projects,
+            DevNest pulls the scattered pieces of your workflow — notes, tasks, projects,
             bookmarks, files, and code snippets — into one fast workspace.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">

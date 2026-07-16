@@ -1,6 +1,6 @@
-# DevBoard
+# DevNest
 
-A developer productivity platform (notes, tasks, projects, bookmarks, knowledge vault, snippets).
+Your AI-powered developer workspace (notes, tasks, projects, bookmarks, knowledge vault, snippets).
 
 Monorepo managed with **pnpm workspaces**.
 

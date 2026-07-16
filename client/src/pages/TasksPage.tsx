@@ -148,7 +148,7 @@ export default function TasksPage() {
         <div>
           <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Tasks</h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Plan, prioritize, and track the work moving through DevBoard.
+            Plan, prioritize, and track the work moving through DevNest.
           </p>
         </div>
         <Button type="button" onClick={openCreateModal} className="gap-2 sm:shrink-0">
