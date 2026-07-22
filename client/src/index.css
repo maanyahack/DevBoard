@@ -4,13 +4,86 @@
    Settings page can toggle it by adding/removing `dark` on <html>. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ─────────────────────────────────────────────
+   Design Tokens
+   ───────────────────────────────────────────── */
+
 :root {
   color-scheme: light;
+
+  /* Surfaces */
+  --surface-bg:      hsl(220 20% 98%);
+  --surface-raised:  hsl(220 14% 96%);
+  --surface-card:    hsl(0 0% 100%);
+  --surface-overlay: hsl(220 20% 98% / 0.88);
+
+  /* Borders */
+  --border-subtle:   hsl(220 13% 91%);
+  --border-soft:     hsl(220 13% 86%);
+  --border-muted:    hsl(220 13% 82%);
+
+  /* Text hierarchy */
+  --text-primary:    hsl(222 47% 11%);
+  --text-secondary:  hsl(215 16% 47%);
+  --text-muted:      hsl(215 13% 63%);
+
+  /* Accent (emerald) */
+  --accent:          hsl(160 84% 39%);
+  --accent-hover:    hsl(160 84% 32%);
+  --accent-subtle:   hsl(160 84% 96%);
+  --accent-ring:     hsl(160 84% 39% / 0.22);
+
+  /* Shadows */
+  --shadow-card:
+    0 1px 3px 0 hsl(220 13% 18% / 0.07),
+    0 1px 2px -1px hsl(220 13% 18% / 0.05);
+  --shadow-card-hover:
+    0 4px 16px -2px hsl(220 13% 18% / 0.09),
+    0 2px 4px -2px hsl(220 13% 18% / 0.06);
+  --shadow-overlay:
+    0 8px 32px -8px hsl(220 13% 18% / 0.12),
+    0 2px 8px -2px hsl(220 13% 18% / 0.06);
+
+  /* Motion */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 html.dark {
   color-scheme: dark;
+
+  --surface-bg:      hsl(222 47% 6%);
+  --surface-raised:  hsl(222 40% 8%);
+  --surface-card:    hsl(222 35% 10%);
+  --surface-overlay: hsl(222 47% 6% / 0.88);
+
+  --border-subtle:   hsl(220 20% 16%);
+  --border-soft:     hsl(220 20% 20%);
+  --border-muted:    hsl(220 20% 24%);
+
+  --text-primary:    hsl(220 14% 96%);
+  --text-secondary:  hsl(215 14% 55%);
+  --text-muted:      hsl(215 12% 40%);
+
+  --accent:          hsl(160 72% 50%);
+  --accent-hover:    hsl(160 72% 43%);
+  --accent-subtle:   hsl(160 72% 50% / 0.12);
+  --accent-ring:     hsl(160 72% 50% / 0.25);
+
+  --shadow-card:
+    0 1px 3px 0 hsl(222 47% 3% / 0.4),
+    0 1px 2px -1px hsl(222 47% 3% / 0.3);
+  --shadow-card-hover:
+    0 4px 20px -4px hsl(222 47% 3% / 0.5),
+    0 2px 8px -2px hsl(222 47% 3% / 0.4);
+  --shadow-overlay:
+    0 8px 32px -8px hsl(222 47% 3% / 0.6),
+    0 2px 8px -2px hsl(222 47% 3% / 0.4);
 }
+
+/* ─────────────────────────────────────────────
+   Base
+   ───────────────────────────────────────────── */
 
 body {
   margin: 0;
@@ -22,10 +95,426 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  cursor: default;
+  background: var(--surface-bg);
+  color: var(--text-primary);
 }
+
+/* ─────────────────────────────────────────────
+   Premium App Shell
+   ───────────────────────────────────────────── */
 
 /* Subtle graph-paper texture for the landing hero. */
 .bg-dot-grid {
-  background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+  background-image: radial-gradient(hsl(220 13% 82%) 1px, transparent 1px);
   background-size: 22px 22px;
+}
+
+.premium-shell {
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+  background:
+    radial-gradient(ellipse 60% 40% at 18% 10%, hsl(160 84% 39% / 0.055), transparent),
+    radial-gradient(ellipse 50% 35% at 82% 8%,  hsl(200 80% 55% / 0.045), transparent),
+    var(--surface-bg);
+}
+
+.dark .premium-shell {
+  background:
+    radial-gradient(ellipse 60% 40% at 18% 10%, hsl(160 72% 50% / 0.07), transparent),
+    radial-gradient(ellipse 50% 35% at 82% 8%,  hsl(200 80% 60% / 0.06), transparent),
+    var(--surface-bg);
+}
+
+/* Subtle grid overlay */
+.premium-shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(hsl(222 47% 11% / 0.028) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(222 47% 11% / 0.028) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(to bottom, black 0%, transparent 72%);
+}
+
+.dark .premium-shell::before {
+  background-image:
+    linear-gradient(hsl(220 14% 96% / 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(220 14% 96% / 0.04) 1px, transparent 1px);
+}
+
+/* ─────────────────────────────────────────────
+   Card Utilities
+   ───────────────────────────────────────────── */
+
+.floating-card {
+  transform: translateZ(0);
+  transition:
+    transform 200ms var(--ease-out),
+    box-shadow 200ms var(--ease-out),
+    border-color 200ms ease,
+    background-color 200ms ease;
+  will-change: transform;
+}
+
+.floating-card:hover {
+  transform: translateY(-2px);
+}
+
+.tilt-card:hover {
+  transform: translateY(-2px) rotateX(1.2deg) rotateY(-1.2deg);
+}
+
+/* Hairline top-edge highlight — gives cards a subtle 3-D lift */
+.card-highlight {
+  position: relative;
+}
+
+.card-highlight::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 0 hsl(0 0% 100% / 0.65);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.dark .card-highlight::before {
+  box-shadow: inset 0 1px 0 0 hsl(0 0% 100% / 0.06);
+}
+
+/* ─────────────────────────────────────────────
+   Interaction Utilities
+   ───────────────────────────────────────────── */
+
+.pressable {
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    opacity 150ms ease;
+}
+
+.pressable:hover {
+  transform: translateY(-1px);
+}
+
+.pressable:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ─────────────────────────────────────────────
+   Skeleton Shimmer
+   ───────────────────────────────────────────── */
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  background: hsl(220 13% 91%);
+}
+
+.dark .skeleton {
+  background: hsl(220 20% 16%);
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsl(0 0% 100% / 0.55) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+.dark .skeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    hsl(0 0% 100% / 0.06) 50%,
+    transparent 100%
+  );
+}
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+/* ─────────────────────────────────────────────
+   Stagger List Animations
+   ───────────────────────────────────────────── */
+
+.stagger-item {
+  animation: card-enter 280ms var(--ease-out) both;
+  animation-delay: calc(var(--stagger, 0) * 50ms);
+}
+
+.stagger-list > * {
+  animation: card-enter 280ms var(--ease-out) both;
+}
+
+.stagger-list > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-list > *:nth-child(2) { animation-delay: 50ms; }
+.stagger-list > *:nth-child(3) { animation-delay: 100ms; }
+.stagger-list > *:nth-child(4) { animation-delay: 150ms; }
+.stagger-list > *:nth-child(5) { animation-delay: 200ms; }
+.stagger-list > *:nth-child(6) { animation-delay: 250ms; }
+.stagger-list > *:nth-child(n + 7) { animation-delay: 300ms; }
+
+/* ─────────────────────────────────────────────
+   AI Surface
+   ───────────────────────────────────────────── */
+
+.ai-surface {
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 5% 0%, hsl(160 84% 39% / 0.07), transparent 14rem),
+    radial-gradient(circle at 95% 0%, hsl(262 83% 68% / 0.06), transparent 14rem);
+  opacity: 0.9;
+}
+
+/* ─────────────────────────────────────────────
+   Custom Cursor
+   ───────────────────────────────────────────── */
+
+.premium-cursor {
+  cursor: none;
+}
+
+.premium-cursor-dot,
+.premium-cursor-ring,
+.premium-cursor-trail {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 9999;
+  pointer-events: none;
+  border-radius: 9999px;
+  opacity: 0;
+  transform: translate3d(var(--cursor-x, -100px), var(--cursor-y, -100px), 0);
+  will-change: transform, width, height, opacity;
+}
+
+.premium-cursor-dot {
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  background: hsl(160 84% 39%);
+  box-shadow:
+    0 0 6px hsl(160 84% 39% / 0.45),
+    0 0 18px hsl(160 84% 39% / 0.18);
+  transition:
+    opacity 120ms ease,
+    width 220ms var(--ease-spring),
+    height 220ms var(--ease-spring),
+    margin 220ms var(--ease-spring);
+}
+
+.dark .premium-cursor-dot {
+  background: hsl(160 72% 50%);
+  box-shadow:
+    0 0 8px hsl(160 72% 50% / 0.45),
+    0 0 22px hsl(160 72% 50% / 0.22);
+}
+
+.premium-cursor-ring {
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  background: hsl(160 84% 39% / 0.055);
+  border: 1.5px solid hsl(160 84% 39% / 0.3);
+  transition:
+    opacity 120ms ease,
+    width 320ms var(--ease-spring),
+    height 320ms var(--ease-spring),
+    margin 320ms var(--ease-spring),
+    background-color 220ms ease,
+    border-color 220ms ease;
+  animation: cursor-ring-pulse 3.2s ease-in-out infinite;
+}
+
+.dark .premium-cursor-ring {
+  background: hsl(160 72% 50% / 0.07);
+  border-color: hsl(160 72% 50% / 0.35);
+}
+
+@keyframes cursor-ring-pulse {
+  0%, 100% {
+    border-color: hsl(160 84% 39% / 0.30);
+    box-shadow: 0 0 10px hsl(160 84% 39% / 0.04);
+  }
+  50% {
+    border-color: hsl(160 84% 39% / 0.50);
+    box-shadow: 0 0 20px hsl(160 84% 39% / 0.08);
+  }
+}
+
+.dark .premium-cursor-ring {
+  animation-name: cursor-ring-pulse-dark;
+}
+
+@keyframes cursor-ring-pulse-dark {
+  0%, 100% {
+    border-color: hsl(160 72% 50% / 0.35);
+    box-shadow: 0 0 12px hsl(160 72% 50% / 0.06);
+  }
+  50% {
+    border-color: hsl(160 72% 50% / 0.55);
+    box-shadow: 0 0 26px hsl(160 72% 50% / 0.10);
+  }
+}
+
+.premium-cursor-trail {
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  background: hsl(199 89% 60% / 0.32);
+  transition: opacity 120ms ease;
+  animation: cursor-trail-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes cursor-trail-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+/* Active states */
+.premium-cursor .premium-cursor-dot,
+.premium-cursor .premium-cursor-ring {
+  opacity: 1;
+}
+
+.premium-cursor .premium-cursor-trail {
+  opacity: 0.3;
+}
+
+.premium-cursor.cursor-interactive .premium-cursor-ring {
+  width: 52px;
+  height: 52px;
+  margin: -26px 0 0 -26px;
+  background: hsl(160 84% 39% / 0.10);
+  border-color: hsl(160 84% 39% / 0.55);
+  box-shadow:
+    0 0 28px hsl(160 84% 39% / 0.10),
+    0 0 44px hsl(160 84% 39% / 0.05);
+  animation: none;
+}
+
+.dark .premium-cursor.cursor-interactive .premium-cursor-ring {
+  background: hsl(160 72% 50% / 0.14);
+  border-color: hsl(160 72% 50% / 0.60);
+  box-shadow:
+    0 0 32px hsl(160 72% 50% / 0.13),
+    0 0 52px hsl(160 72% 50% / 0.07);
+}
+
+.premium-cursor.cursor-interactive .premium-cursor-dot {
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  background: hsl(0 0% 100%);
+  box-shadow:
+    0 0 8px hsl(160 84% 39% / 0.55),
+    0 0 22px hsl(160 84% 39% / 0.28);
+}
+
+.dark .premium-cursor.cursor-interactive .premium-cursor-dot {
+  box-shadow:
+    0 0 10px hsl(160 72% 50% / 0.58),
+    0 0 26px hsl(160 72% 50% / 0.30);
+}
+
+.premium-cursor.cursor-interactive .premium-cursor-trail {
+  opacity: 0 !important;
+  animation: none;
+}
+
+/* ─────────────────────────────────────────────
+   Keyframes
+   ───────────────────────────────────────────── */
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-enter {
+  animation: page-enter 260ms var(--ease-out) both;
+}
+
+@keyframes card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ─────────────────────────────────────────────
+   Accessibility — Reduced Motion
+   ───────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+  .premium-cursor {
+    cursor: default;
+  }
+
+  .premium-cursor-dot,
+  .premium-cursor-ring,
+  .premium-cursor-trail {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+
+  .floating-card:hover,
+  .tilt-card:hover,
+  .pressable:hover,
+  .pressable:active {
+    transform: none;
+  }
 }

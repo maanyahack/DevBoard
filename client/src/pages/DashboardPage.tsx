@@ -10,8 +10,10 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useState, type ReactNode } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
+import { motion } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
+import { ActivityTimeline } from '@/features/dashboard/components/ActivityTimeline';
 import { DashboardPanel } from '@/features/dashboard/components/DashboardPanel';
 import { DashboardSkeleton } from '@/features/dashboard/components/DashboardSkeleton';
 import { StatCard } from '@/features/dashboard/components/StatCard';
@@ -62,9 +64,21 @@ function formatDate(value?: string): string {
   }).format(value ? new Date(value) : new Date());
 }
 
+function getGreeting(name: string): string {
+  const hour = new Date().getHours();
+  const timeGreeting =
+    hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const displayName = name.trim().split(' ')[0];
+  return `${timeGreeting}, ${displayName}`;
+}
+
 export default function DashboardPage() {
-  const { session } = useAuth();
+  const { session, user } = useAuth();
   const accessToken = session?.access_token;
+  const displayName =
+    (user?.user_metadata?.display_name as string | undefined) ??
+    user?.email?.split('@')[0] ??
+    'there';
 
   const dashboardQuery = useQuery({
     queryKey: [...dashboardQueryKey, accessToken],
@@ -73,49 +87,53 @@ export default function DashboardPage() {
   });
 
   return (
-    <div>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+    >
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-slate-100">
-            Welcome back
+            {getGreeting(displayName)}
           </h1>
-          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{formatDate()}</p>
+          <p className="mt-1 text-sm text-[var(--text-secondary)]">{formatDate()}</p>
         </div>
       </div>
 
       {dashboardQuery.isLoading && <DashboardSkeleton />}
       {dashboardQuery.isError && <ErrorMessage message={(dashboardQuery.error as Error).message} />}
       {dashboardQuery.data && (
-        <div className="mt-8 space-y-6">
+        <div className="mt-8 space-y-5">
           {/* Stat cards */}
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <StatCard label="Total Projects" value={dashboardQuery.data.stats.projects} icon={<FolderKanban className="h-4 w-4" />} />
-            <StatCard label="Total Tasks" value={dashboardQuery.data.stats.tasks} icon={<ListTodo className="h-4 w-4" />} />
-            <StatCard label="Completed Tasks" value={dashboardQuery.data.stats.completedTasks} icon={<CheckCircle2 className="h-4 w-4" />} />
-            <StatCard label="Total Notes" value={dashboardQuery.data.stats.notes} icon={<NotebookText className="h-4 w-4" />} />
+            <div style={{ '--stagger': 0 } as CSSProperties}><StatCard label="Total Projects"   value={dashboardQuery.data.stats.projects}       icon={<FolderKanban className="h-4 w-4" />} accent="sky"     /></div>
+            <div style={{ '--stagger': 1 } as CSSProperties}><StatCard label="Total Tasks"      value={dashboardQuery.data.stats.tasks}           icon={<ListTodo className="h-4 w-4" />}     accent="amber"   /></div>
+            <div style={{ '--stagger': 2 } as CSSProperties}><StatCard label="Completed Tasks"  value={dashboardQuery.data.stats.completedTasks}  icon={<CheckCircle2 className="h-4 w-4" />} accent="emerald" /></div>
+            <div style={{ '--stagger': 3 } as CSSProperties}><StatCard label="Total Notes"      value={dashboardQuery.data.stats.notes}           icon={<NotebookText className="h-4 w-4" />} accent="violet"  /></div>
           </div>
 
-          {/* AI Insights — full width, above the data panels */}
+          {/* AI Insights */}
           <AIInsightsPanel accessToken={accessToken} />
 
           {/* Main data panels */}
-          <div className="grid gap-4 xl:grid-cols-3">
+          <div className="stagger-list grid gap-4 xl:grid-cols-3">
             <DashboardPanel title="Recent Tasks">
-              <ListEmpty empty={dashboardQuery.data.recentTasks.length === 0} text="No tasks yet.">
+              <ListEmpty empty={dashboardQuery.data.recentTasks.length === 0} text="No tasks yet." icon="tasks">
                 {dashboardQuery.data.recentTasks.map((task) => (
                   <ListItem key={task.id} title={task.title} meta={`${taskStatusLabels[task.status]} · ${taskPriorityLabels[task.priority]}`} />
                 ))}
               </ListEmpty>
             </DashboardPanel>
             <DashboardPanel title="Recent Notes">
-              <ListEmpty empty={dashboardQuery.data.recentNotes.length === 0} text="No notes yet.">
+              <ListEmpty empty={dashboardQuery.data.recentNotes.length === 0} text="No notes yet." icon="notes">
                 {dashboardQuery.data.recentNotes.map((note) => (
                   <ListItem key={note.id} title={note.title} meta={`Updated ${formatDate(note.updatedAt)}`} />
                 ))}
               </ListEmpty>
             </DashboardPanel>
             <DashboardPanel title="Active Projects">
-              <ListEmpty empty={dashboardQuery.data.activeProjects.length === 0} text="No active projects.">
+              <ListEmpty empty={dashboardQuery.data.activeProjects.length === 0} text="No active projects." icon="projects">
                 {dashboardQuery.data.activeProjects.map((project) => (
                   <ListItem
                     key={project.id}
@@ -130,15 +148,19 @@ export default function DashboardPage() {
 
           {/* Quick Actions */}
           <DashboardPanel title="Quick Actions">
-            <div className="grid gap-2.5 sm:grid-cols-3">
-              <QuickAction to="/notes" label="New Note" />
-              <QuickAction to="/tasks" label="New Task" />
+            <div className="stagger-list grid gap-2.5 sm:grid-cols-3">
+              <QuickAction to="/notes"    label="New Note"    />
+              <QuickAction to="/tasks"    label="New Task"    />
               <QuickAction to="/projects" label="New Project" />
             </div>
           </DashboardPanel>
+
+          <DashboardPanel title="Activity Timeline">
+            <ActivityTimeline activities={dashboardQuery.data.activities} />
+          </DashboardPanel>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -153,21 +175,21 @@ function AIInsightsPanel({ accessToken }: { accessToken: string | undefined }) {
   });
 
   return (
-    <section className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700/80 dark:bg-slate-800">
+    <section className="ai-surface card-highlight floating-card stagger-item rounded-xl border border-emerald-200/70 bg-[var(--surface-card)] shadow-[var(--shadow-card)] hover:border-emerald-300/60 hover:shadow-[var(--shadow-card-hover)] dark:border-emerald-500/20 dark:hover:border-emerald-500/35">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-100 px-5 py-3.5 dark:border-slate-700/60">
+      <div className="relative z-10 flex items-center justify-between border-b border-[var(--border-subtle)] px-5 py-3.5">
         <div className="flex items-center gap-2.5">
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20">
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-300 dark:ring-emerald-500/20">
             <Bot className="h-3.5 w-3.5" />
           </span>
-          <h2 className="text-[13px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+          <h2 className="text-[11px] font-semibold uppercase tracking-widest text-emerald-700/70 dark:text-emerald-300/70">
             AI Insights
           </h2>
         </div>
         <button
           onClick={() => insightsMutation.mutate()}
           disabled={insightsMutation.isPending}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm shadow-emerald-500/20 transition-all duration-150 hover:bg-emerald-700 disabled:pointer-events-none disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+          className="pressable inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-[0_1px_2px_0_hsl(160_84%_20%/0.35)] hover:bg-emerald-700 disabled:pointer-events-none disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
         >
           {insightsMutation.isPending ? (
             <>
@@ -184,19 +206,21 @@ function AIInsightsPanel({ accessToken }: { accessToken: string | undefined }) {
       </div>
 
       {/* Body */}
-      <div className="px-5 py-4">
+      <div className="relative z-10 px-5 py-4">
         {insightsMutation.isError && (
           <p className="text-sm text-red-500 dark:text-red-400">
             {(insightsMutation.error as Error).message}
           </p>
         )}
         {!insights && !insightsMutation.isPending && !insightsMutation.isError && (
-          <p className="text-sm text-slate-400 dark:text-slate-500">
-            Click <span className="font-medium text-slate-500 dark:text-slate-400">Generate Insights</span> to get personalised productivity feedback based on your current workspace.
+          <p className="text-sm text-[var(--text-muted)]">
+            Click{' '}
+            <span className="font-medium text-slate-600 dark:text-slate-400">Generate Insights</span>{' '}
+            to get personalised productivity feedback based on your current workspace.
           </p>
         )}
         {insightsMutation.isPending && (
-          <div className="flex items-center gap-3 text-sm text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]">
             <Loader2 className="h-4 w-4 animate-spin text-emerald-500" />
             Analysing your workspace…
           </div>
@@ -213,31 +237,71 @@ function AIInsightsPanel({ accessToken }: { accessToken: string | undefined }) {
 
 function ErrorMessage({ message }: { message: string }) {
   return (
-    <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-5 text-sm font-medium text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
-      {message}
+    <div className="mt-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-500/25 dark:bg-red-500/8 dark:text-red-300">
+      <svg className="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1Zm-.75 3.5a.75.75 0 0 1 1.5 0v3.25a.75.75 0 0 1-1.5 0V4.5Zm.75 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11Z" />
+      </svg>
+      <span className="font-medium">{message}</span>
     </div>
   );
 }
 
-function ListEmpty({ empty, text, children }: { empty: boolean; text: string; children: ReactNode }) {
+type EmptyIcon = 'tasks' | 'notes' | 'projects';
+
+const emptyIcons: Record<EmptyIcon, ReactNode> = {
+  tasks: (
+    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+      <rect x="3" y="3" width="18" height="18" rx="3" />
+      <path d="m8 12 3 3 5-6" />
+    </svg>
+  ),
+  notes: (
+    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+      <path d="M4 4h11l5 5v11a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z" />
+      <path d="M14 4v5h5M8 13h8M8 17h5" />
+    </svg>
+  ),
+  projects: (
+    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+      <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" />
+    </svg>
+  ),
+};
+
+function ListEmpty({
+  empty,
+  text,
+  icon,
+  children,
+}: {
+  empty: boolean;
+  text: string;
+  icon: EmptyIcon;
+  children: ReactNode;
+}) {
   return empty ? (
-    <p className="text-sm text-slate-400 dark:text-slate-500">{text}</p>
+    <div className="flex flex-col items-center gap-2 py-4 text-center">
+      <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-400 dark:bg-slate-800">
+        {emptyIcons[icon]}
+      </span>
+      <p className="text-sm text-[var(--text-muted)]">{text}</p>
+    </div>
   ) : (
-    <div className="space-y-2">{children}</div>
+    <div className="space-y-1.5">{children}</div>
   );
 }
 
 function ListItem({ title, meta, href }: { title: string; meta: string; href?: string }) {
   return (
-    <div className="group rounded-lg border border-slate-100 p-3 transition-all duration-150 hover:border-slate-200 hover:bg-slate-50/80 dark:border-slate-700/60 dark:hover:border-slate-600 dark:hover:bg-slate-700/30">
+    <div className="group rounded-lg border border-[var(--border-subtle)] p-3 transition-all duration-150 hover:border-[var(--border-soft)] hover:bg-slate-50/60 hover:shadow-sm dark:hover:bg-slate-800/40">
       <p className="line-clamp-1 text-sm font-medium text-slate-900 dark:text-slate-100">{title}</p>
-      <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">{meta}</p>
+      <p className="mt-0.5 text-xs text-[var(--text-muted)]">{meta}</p>
       {href && (
         <a
           href={href}
           target="_blank"
           rel="noreferrer"
-          className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-emerald-600 transition-colors duration-150 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+          className="mt-2 inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 transition-colors duration-150 hover:bg-slate-200 hover:text-slate-900 dark:bg-slate-700/60 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-slate-100"
         >
           GitHub Repository
         </a>
@@ -250,9 +314,9 @@ function QuickAction({ to, label }: { to: string; label: string }) {
   return (
     <Link
       to={to}
-      className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all duration-150 hover:border-slate-300 hover:bg-slate-50 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-700/80"
+      className="pressable inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] px-3 py-2.5 text-sm font-medium text-slate-700 shadow-[var(--shadow-card)] transition-all duration-150 hover:border-emerald-200/80 hover:bg-emerald-50/60 hover:text-emerald-800 hover:shadow-[var(--shadow-card-hover)] focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-emerald-500/25 dark:hover:bg-emerald-500/8 dark:hover:text-emerald-200"
     >
-      <Plus className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+      <Plus className="h-3.5 w-3.5 text-emerald-500 dark:text-emerald-400" />
       {label}
     </Link>
   );

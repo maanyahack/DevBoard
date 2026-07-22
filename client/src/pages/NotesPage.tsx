@@ -1,148 +1,121 @@
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { CheckSquare2, Pin, PinOff, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useAuth } from '@/context/AuthContext';
 import { NoteCard } from '@/features/notes/components/NoteCard';
 import { NoteModal } from '@/features/notes/components/NoteModal';
+import { apiRequest } from '@/lib/api';
 import type { Note, NoteEditableFields } from '@/features/notes/types';
 
 const allCategoriesLabel = 'All categories';
 const dashboardQueryKey = ['dashboard'];
 const notesQueryKey = ['notes'];
-const apiBaseUrl = import.meta.env.VITE_API_URL.replace(/\/$/, '');
 
-type ApiNote = Omit<Note, 'category' | 'isPinned'>;
-type NotePayload = Pick<NoteEditableFields, 'title' | 'content'>;
+type SortKey = 'newest' | 'oldest' | 'pinned' | 'alpha';
 
 interface NotesResponse {
-  notes: ApiNote[];
+  notes: Note[];
 }
 
 interface NoteResponse {
-  note: ApiNote;
+  note: Note;
 }
 
-interface NoteMeta {
-  category: string;
-  isPinned: boolean;
-}
-
-function isErrorResponse(value: unknown): value is { message: string } {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'message' in value &&
-    typeof value.message === 'string'
-  );
-}
-
-async function getErrorMessage(response: Response): Promise<string> {
-  const body: unknown = await response.json().catch(() => null);
-
-  if (isErrorResponse(body)) {
-    return body.message;
+function sortNotes(notes: Note[], key: SortKey): Note[] {
+  const copy = [...notes];
+  switch (key) {
+    case 'newest':
+      return copy.sort((a, b) => {
+        if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      });
+    case 'oldest':
+      return copy.sort((a, b) => {
+        if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+        return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+      });
+    case 'pinned':
+      return copy.sort((a, b) => {
+        if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+        return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      });
+    case 'alpha':
+      return copy.sort((a, b) => a.title.localeCompare(b.title));
   }
-
-  return `Request failed with status ${response.status}`;
-}
-
-async function apiRequest<T>(
-  path: string,
-  accessToken: string,
-  options: RequestInit = {},
-): Promise<T> {
-  const response = await fetch(`${apiBaseUrl}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${accessToken}`,
-      ...options.headers,
-    },
-  });
-
-  if (!response.ok) {
-    throw new Error(await getErrorMessage(response));
-  }
-
-  if (response.status === 204) {
-    return undefined as T;
-  }
-
-  return (await response.json()) as T;
-}
-
-function toNote(apiNote: ApiNote, meta?: NoteMeta): Note {
-  return {
-    ...apiNote,
-    category: meta?.category ?? 'General',
-    isPinned: meta?.isPinned ?? false,
-  };
-}
-
-function sortNotes(notes: Note[]): Note[] {
-  return [...notes].sort((a, b) => {
-    if (a.isPinned !== b.isPinned) {
-      return a.isPinned ? -1 : 1;
-    }
-
-    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-  });
 }
 
 export default function NotesPage() {
   const { session } = useAuth();
   const queryClient = useQueryClient();
   const accessToken = session?.access_token;
+
+  // Filter / sort state
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(allCategoriesLabel);
+  const [sortKey, setSortKey] = useState<SortKey>('newest');
+
+  // Modal state
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [noteMeta, setNoteMeta] = useState<Record<string, NoteMeta>>({});
 
+
+
+  // Bulk selection state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const selectionMode = selectedIds.size > 0;
+
+  // ─── Queries ───────────────────────────────────────────────────────────────
   const notesQuery = useQuery({
     queryKey: [...notesQueryKey, accessToken],
     enabled: Boolean(accessToken),
     queryFn: async () => {
-      if (!accessToken) {
-        throw new Error('Authentication required.');
-      }
-
+      if (!accessToken) throw new Error('Authentication required.');
       const data = await apiRequest<NotesResponse>('/api/notes', accessToken);
       return data.notes;
     },
   });
 
-  const notes = useMemo(
-    () => (notesQuery.data ?? []).map((note) => toNote(note, noteMeta[note.id])),
-    [notesQuery.data, noteMeta],
+  const notes = notesQuery.data ?? [];
+
+  const categories = useMemo(
+    () => [allCategoriesLabel, ...Array.from(new Set(notes.map((n) => n.category))).sort()],
+    [notes],
   );
 
+  const visibleNotes = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    const filtered = notes.filter((note) => {
+      const matchesCategory =
+        selectedCategory === allCategoriesLabel || note.category === selectedCategory;
+      const matchesSearch =
+        !query ||
+        note.title.toLowerCase().includes(query) ||
+        note.content.toLowerCase().includes(query) ||
+        note.category.toLowerCase().includes(query);
+      return matchesCategory && matchesSearch;
+    });
+    return sortNotes(filtered, sortKey);
+  }, [notes, search, selectedCategory, sortKey]);
+
+  // ─── Mutations ─────────────────────────────────────────────────────────────
   const createMutation = useMutation({
     mutationFn: async (fields: NoteEditableFields) => {
-      if (!accessToken) {
-        throw new Error('Authentication required.');
-      }
-
-      const payload: NotePayload = {
+      if (!accessToken) throw new Error('Authentication required.');
+      const payload = {
         title: fields.title,
         content: fields.content,
+        category: fields.category || 'General',
+        isPinned: fields.isPinned,
       };
       const data = await apiRequest<NoteResponse>('/api/notes', accessToken, {
         method: 'POST',
         body: JSON.stringify(payload),
       });
-
-      return { note: data.note, fields };
+      return data.note;
     },
-    onSuccess: ({ note, fields }) => {
-      setNoteMeta((current) => ({
-        ...current,
-        [note.id]: {
-          category: fields.category || 'General',
-          isPinned: fields.isPinned,
-        },
-      }));
+    onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: notesQueryKey });
       void queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
       closeModal();
@@ -151,29 +124,20 @@ export default function NotesPage() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ noteId, fields }: { noteId: string; fields: NoteEditableFields }) => {
-      if (!accessToken) {
-        throw new Error('Authentication required.');
-      }
-
-      const payload: NotePayload = {
+      if (!accessToken) throw new Error('Authentication required.');
+      const payload = {
         title: fields.title,
         content: fields.content,
+        category: fields.category || 'General',
+        isPinned: fields.isPinned,
       };
       const data = await apiRequest<NoteResponse>(`/api/notes/${noteId}`, accessToken, {
         method: 'PUT',
         body: JSON.stringify(payload),
       });
-
-      return { note: data.note, fields };
+      return data.note;
     },
-    onSuccess: ({ note, fields }) => {
-      setNoteMeta((current) => ({
-        ...current,
-        [note.id]: {
-          category: fields.category || 'General',
-          isPinned: fields.isPinned,
-        },
-      }));
+    onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: notesQueryKey });
       void queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
       closeModal();
@@ -182,22 +146,10 @@ export default function NotesPage() {
 
   const deleteMutation = useMutation({
     mutationFn: async (noteId: string) => {
-      if (!accessToken) {
-        throw new Error('Authentication required.');
-      }
-
-      await apiRequest<void>(`/api/notes/${noteId}`, accessToken, {
-        method: 'DELETE',
-      });
-
-      return noteId;
+      if (!accessToken) throw new Error('Authentication required.');
+      await apiRequest<void>(`/api/notes/${noteId}`, accessToken, { method: 'DELETE' });
     },
-    onSuccess: (noteId) => {
-      setNoteMeta((current) => {
-        const next = { ...current };
-        delete next[noteId];
-        return next;
-      });
+    onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: notesQueryKey });
       void queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
     },
@@ -207,76 +159,122 @@ export default function NotesPage() {
     createMutation.error ?? updateMutation.error ?? deleteMutation.error ?? null;
   const isSaving = createMutation.isPending || updateMutation.isPending;
 
-  const categories = useMemo(
-    () => [allCategoriesLabel, ...Array.from(new Set(notes.map((note) => note.category))).sort()],
-    [notes],
-  );
-
-  const visibleNotes = useMemo(() => {
-    const query = search.trim().toLowerCase();
-
-    return sortNotes(
-      notes.filter((note) => {
-        const matchesCategory =
-          selectedCategory === allCategoriesLabel || note.category === selectedCategory;
-        const matchesSearch =
-          !query ||
-          note.title.toLowerCase().includes(query) ||
-          note.content.toLowerCase().includes(query) ||
-          note.category.toLowerCase().includes(query);
-
-        return matchesCategory && matchesSearch;
-      }),
-    );
-  }, [notes, search, selectedCategory]);
-
-  function openCreateModal() {
-    setEditingNote(null);
-    setIsModalOpen(true);
-  }
-
-  function openEditModal(note: Note) {
-    setEditingNote(note);
-    setIsModalOpen(true);
-  }
-
+  // ─── Modal handlers ────────────────────────────────────────────────────────
+  function openCreateModal() { setEditingNote(null); setIsModalOpen(true); }
+  function openEditModal(note: Note) { setEditingNote(note); setIsModalOpen(true); }
   function closeModal() {
     setIsModalOpen(false);
     setEditingNote(null);
     createMutation.reset();
     updateMutation.reset();
   }
-
   function handleSave(fields: NoteEditableFields) {
-    if (editingNote) {
-      updateMutation.mutate({ noteId: editingNote.id, fields });
-      return;
-    }
-
+    if (editingNote) { updateMutation.mutate({ noteId: editingNote.id, fields }); return; }
     createMutation.mutate(fields);
   }
 
-  function handleDelete(noteId: string) {
-    deleteMutation.mutate(noteId);
-  }
+  // ─── Single-item handlers ──────────────────────────────────────────────────
+  function handleDelete(noteId: string) { deleteMutation.mutate(noteId); }
 
   function handleTogglePinned(noteId: string) {
-    setNoteMeta((current) => {
-      const currentMeta = current[noteId];
-      const note = notes.find((item) => item.id === noteId);
+    const note = notes.find((item) => item.id === noteId);
+    if (!note) return;
 
-      return {
-        ...current,
-        [noteId]: {
-          category: currentMeta?.category ?? note?.category ?? 'General',
-          isPinned: !(currentMeta?.isPinned ?? note?.isPinned ?? false),
-        },
-      };
+    updateMutation.mutate({
+      noteId,
+      fields: {
+        title: note.title,
+        content: note.content,
+        category: note.category,
+        isPinned: !note.isPinned,
+      },
     });
   }
 
+  // ─── Selection handlers ────────────────────────────────────────────────────
+  function toggleSelect(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) { next.delete(id); } else { next.add(id); }
+      return next;
+    });
+  }
+
+  function clearSelection() { setSelectedIds(new Set()); }
+
+  function toggleSelectAll() {
+    if (selectedIds.size === visibleNotes.length) {
+      clearSelection();
+    } else {
+      setSelectedIds(new Set(visibleNotes.map((n) => n.id)));
+    }
+  }
+
+  // ─── Bulk action handlers ──────────────────────────────────────────────────
+  async function handleBulkDelete() {
+    if (!accessToken) return;
+    const ids = Array.from(selectedIds);
+    await Promise.allSettled(
+      ids.map((id) => apiRequest<void>(`/api/notes/${id}`, accessToken, { method: 'DELETE' })),
+    );
+    void queryClient.invalidateQueries({ queryKey: notesQueryKey });
+    void queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
+    clearSelection();
+  }
+
+  async function handleBulkPin() {
+    if (!accessToken) return;
+    const token = accessToken;
+    const ids = Array.from(selectedIds);
+    await Promise.allSettled(
+      ids.map((id) => {
+        const note = notes.find((n) => n.id === id);
+        if (!note) return Promise.resolve();
+        return apiRequest<NoteResponse>(`/api/notes/${id}`, token, {
+          method: 'PUT',
+          body: JSON.stringify({
+            title: note.title,
+            content: note.content,
+            category: note.category,
+            isPinned: true,
+          }),
+        });
+      }),
+    );
+    void queryClient.invalidateQueries({ queryKey: notesQueryKey });
+    void queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
+    clearSelection();
+  }
+
+  async function handleBulkUnpin() {
+    if (!accessToken) return;
+    const token = accessToken;
+    const ids = Array.from(selectedIds);
+    await Promise.allSettled(
+      ids.map((id) => {
+        const note = notes.find((n) => n.id === id);
+        if (!note) return Promise.resolve();
+        return apiRequest<NoteResponse>(`/api/notes/${id}`, token, {
+          method: 'PUT',
+          body: JSON.stringify({
+            title: note.title,
+            content: note.content,
+            category: note.category,
+            isPinned: false,
+          }),
+        });
+      }),
+    );
+    void queryClient.invalidateQueries({ queryKey: notesQueryKey });
+    void queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
+    clearSelection();
+  }
+
+  const allVisibleSelected = visibleNotes.length > 0 && selectedIds.size === visibleNotes.length;
+
   return (
     <div>
+      {/* Page heading */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">Notes</h1>
@@ -289,18 +287,17 @@ export default function NotesPage() {
         </Button>
       </div>
 
+      {/* Loading / error states */}
       {notesQuery.isLoading && (
         <div className="mt-6 rounded-lg border border-slate-200 bg-white p-6 text-sm text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
           Loading notes...
         </div>
       )}
-
       {notesQuery.isError && (
         <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-6 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
           {(notesQuery.error as Error).message}
         </div>
       )}
-
       {mutationError && (
         <div className="mt-6 rounded-lg border border-red-200 bg-red-50 p-6 text-sm text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300">
           {(mutationError as Error).message}
@@ -309,43 +306,98 @@ export default function NotesPage() {
 
       {!notesQuery.isLoading && !notesQuery.isError && (
         <>
-          <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
-            <Input
-              id="notes-search"
-              label="Search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search notes"
-            />
+          {/* ── Toolbar ─────────────────────────────────────────────────────── */}
+          {selectionMode ? (
+            /* Bulk action bar */
+            <div className="mt-6 flex flex-wrap items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50/60 px-4 py-3 dark:border-emerald-500/30 dark:bg-emerald-500/10">
+              {/* Count / select-all toggle */}
+              <button
+                type="button"
+                onClick={toggleSelectAll}
+                className="flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-100 dark:text-emerald-300 dark:hover:bg-emerald-500/20"
+              >
+                <CheckSquare2 className="h-4 w-4" />
+                {allVisibleSelected ? 'Deselect all' : `${selectedIds.size} selected`}
+              </button>
 
-            <div className="space-y-1.5">
-              <label
-                htmlFor="notes-category"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-              >
-                Category
-              </label>
-              <select
-                id="notes-category"
-                value={selectedCategory}
-                onChange={(event) => setSelectedCategory(event.target.value)}
-                className="h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-300 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-100"
-              >
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {category}
-                  </option>
-                ))}
-              </select>
+              <div className="mx-1 h-5 w-px bg-emerald-200 dark:bg-emerald-500/30" />
+
+              <Button size="sm" variant="secondary" onClick={handleBulkPin}>
+                <Pin className="h-3.5 w-3.5" />
+                Pin
+              </Button>
+              <Button size="sm" variant="secondary" onClick={handleBulkUnpin}>
+                <PinOff className="h-3.5 w-3.5" />
+                Unpin
+              </Button>
+              <Button size="sm" variant="danger" onClick={() => void handleBulkDelete()}>
+                <Trash2 className="h-3.5 w-3.5" />
+                Delete
+              </Button>
+
+              <div className="ml-auto flex items-center gap-2">
+                {/* Sort — always visible */}
+                <SortDropdown value={sortKey} onChange={setSortKey} />
+                <Button size="sm" variant="ghost" onClick={clearSelection}>
+                  <X className="h-3.5 w-3.5" />
+                  Clear
+                </Button>
+              </div>
             </div>
-          </div>
+          ) : (
+            /* Normal search / filter toolbar */
+            <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1fr)_200px_160px]">
+              <Input
+                id="notes-search"
+                label="Search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search notes"
+              />
 
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="notes-category"
+                  className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+                >
+                  Category
+                </label>
+                <select
+                  id="notes-category"
+                  value={selectedCategory}
+                  onChange={(event) => setSelectedCategory(event.target.value)}
+                  className="h-9 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-300 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-100"
+                >
+                  {categories.map((category) => (
+                    <option key={category} value={category}>
+                      {category}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label
+                  htmlFor="notes-sort"
+                  className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+                >
+                  Sort
+                </label>
+                <SortDropdown value={sortKey} onChange={setSortKey} id="notes-sort" />
+              </div>
+            </div>
+          )}
+
+          {/* ── Card grid ───────────────────────────────────────────────────── */}
           {visibleNotes.length > 0 ? (
-            <div className="mt-6 grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
+            <div className="stagger-list mt-6 grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
               {visibleNotes.map((note) => (
                 <NoteCard
                   key={note.id}
                   note={note}
+                  isSelected={selectedIds.has(note.id)}
+                  selectionMode={selectionMode}
+                  onSelect={toggleSelect}
                   onEdit={openEditModal}
                   onDelete={handleDelete}
                   onTogglePinned={handleTogglePinned}
@@ -373,5 +425,30 @@ export default function NotesPage() {
         onSave={handleSave}
       />
     </div>
+  );
+}
+
+// ─── Sort dropdown ───────────────────────────────────────────────────────────
+function SortDropdown({
+  value,
+  onChange,
+  id = 'notes-sort-inline',
+}: {
+  value: SortKey;
+  onChange: (v: SortKey) => void;
+  id?: string;
+}) {
+  return (
+    <select
+      id={id}
+      value={value}
+      onChange={(e) => onChange(e.target.value as SortKey)}
+      className="h-9 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-300 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-100"
+    >
+      <option value="newest">Newest</option>
+      <option value="oldest">Oldest</option>
+      <option value="pinned">Pinned first</option>
+      <option value="alpha">Alphabetical</option>
+    </select>
   );
 }

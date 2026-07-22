@@ -8,11 +8,30 @@ export interface DashboardStats {
   notes: number;
 }
 
+export type ActivityType =
+  | 'project_created'
+  | 'task_created'
+  | 'task_completed'
+  | 'note_created'
+  | 'bookmark_added'
+  | 'knowledge_entry_created'
+  | 'ai_summary_generated'
+  | 'ai_tasks_generated';
+
+export interface ActivityEvent {
+  id: string;
+  type: ActivityType;
+  title: string;
+  metadata: Record<string, string | number | boolean | null>;
+  createdAt: string;
+}
+
 export interface DashboardTask {
   id: string;
   title: string;
   status: TaskStatus;
   priority: TaskPriority;
+  projectId: string | null;
   updatedAt: string;
 }
 
@@ -35,4 +54,5 @@ export interface DashboardData {
   recentTasks: DashboardTask[];
   recentNotes: DashboardNote[];
   activeProjects: DashboardProject[];
+  activities: ActivityEvent[];
 }

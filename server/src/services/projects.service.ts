@@ -1,5 +1,6 @@
 import { supabaseAdmin } from '../config/supabase.js';
 import { HttpError } from '../middleware/error.middleware.js';
+import { logActivity } from './activity.service.js';
 
 export interface ProjectInput {
   name: string;
@@ -84,7 +85,14 @@ export async function createProject(
     throw new HttpError(500, 'Failed to create project', 'Internal Server Error');
   }
 
-  return mapProject(data as ProjectRecord);
+  const project = mapProject(data as ProjectRecord);
+  await logActivity(userId, {
+    type: 'project_created',
+    title: `Project created: ${project.name}`,
+    metadata: { projectId: project.id },
+  });
+
+  return project;
 }
 
 export async function updateProject(

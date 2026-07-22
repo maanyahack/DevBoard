@@ -8,6 +8,7 @@ export interface Task {
   status: TaskStatus;
   priority: TaskPriority;
   dueDate: string | null;
+  projectId: string | null;
   sortOrder: number;
   createdAt: string;
   updatedAt: string;
@@ -15,7 +16,7 @@ export interface Task {
 
 export type TaskEditableFields = Pick<
   Task,
-  'title' | 'description' | 'status' | 'priority' | 'dueDate' | 'sortOrder'
+  'title' | 'description' | 'status' | 'priority' | 'dueDate' | 'projectId' | 'sortOrder'
 >;
 
 export const taskStatusLabels: Record<TaskStatus, string> = {

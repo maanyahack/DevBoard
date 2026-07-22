@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { motion } from 'framer-motion';
 
 interface DashboardPanelProps {
   title: string;
@@ -7,13 +8,18 @@ interface DashboardPanelProps {
 
 export function DashboardPanel({ title, children }: DashboardPanelProps) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700/80 dark:bg-slate-800">
-      <div className="border-b border-slate-100 px-5 py-3.5 dark:border-slate-700/60">
-        <h2 className="text-[13px] font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+    <motion.section
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+      className="card-highlight floating-card stagger-item rounded-xl border border-[var(--border-subtle)] bg-[var(--surface-card)] shadow-[var(--shadow-card)] hover:border-[var(--border-soft)] hover:shadow-[var(--shadow-card-hover)]"
+    >
+      <div className="border-b border-[var(--border-subtle)] px-5 py-3.5">
+        <h2 className="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-muted)]">
           {title}
         </h2>
       </div>
       <div className="p-5">{children}</div>
-    </section>
+    </motion.section>
   );
 }

@@ -8,6 +8,8 @@ import { createNote, deleteNote, listNotes, updateNote } from '../services/notes
 export const noteBodySchema = z.object({
   title: z.string().trim().min(1, 'Title is required').max(200, 'Title must be 200 characters or less'),
   content: z.string().max(20000, 'Content must be 20,000 characters or less').default(''),
+  category: z.string().max(100, 'Category must be 100 characters or less').default('General'),
+  isPinned: z.boolean().default(false),
 });
 
 type NoteBody = z.infer<typeof noteBodySchema>;

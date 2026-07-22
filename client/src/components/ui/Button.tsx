@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { motion } from 'framer-motion';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -8,22 +9,22 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const base =
-  'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 dark:focus-visible:ring-offset-slate-900';
+  'relative inline-flex items-center justify-center gap-2 rounded-lg font-medium select-none focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white disabled:pointer-events-none disabled:opacity-50 dark:focus-visible:ring-offset-slate-900 transition-colors duration-150';
 
 const sizes: Record<NonNullable<ButtonProps['size']>, string> = {
-  sm: 'px-3 py-1.5 text-xs',
-  md: 'px-4 py-2 text-sm',
+  sm: 'h-7 px-3 text-xs',
+  md: 'h-9 px-4 text-sm',
 };
 
 const variants: Record<NonNullable<ButtonProps['variant']>, string> = {
   primary:
-    'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20 hover:bg-emerald-700 active:bg-emerald-800',
+    'bg-emerald-600 text-white shadow-[0_1px_2px_0_hsl(160_84%_20%/0.35),inset_0_1px_0_0_hsl(0_0%_100%/0.12)] hover:bg-emerald-700 active:bg-emerald-800 active:shadow-none',
   secondary:
-    'border border-slate-200 bg-white text-slate-700 shadow-sm hover:border-slate-300 hover:bg-slate-50 active:bg-slate-100 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:border-slate-600 dark:hover:bg-slate-700/80',
+    'border border-[var(--border-subtle)] bg-[var(--surface-card)] text-slate-700 shadow-[var(--shadow-card)] hover:border-[var(--border-soft)] hover:bg-slate-50 hover:shadow-[var(--shadow-card-hover)] dark:text-slate-200 dark:hover:bg-slate-800/70',
   ghost:
     'text-slate-600 hover:bg-slate-100 hover:text-slate-900 active:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100',
   danger:
-    'bg-red-600 text-white shadow-sm hover:bg-red-700 active:bg-red-800',
+    'bg-red-600 text-white shadow-[0_1px_2px_0_hsl(0_72%_20%/0.30),inset_0_1px_0_0_hsl(0_0%_100%/0.1)] hover:bg-red-700 active:bg-red-800',
 };
 
 const spinner = (
@@ -43,10 +44,13 @@ export function Button({
   ...props
 }: ButtonProps) {
   return (
-    <button
+    <motion.button
       className={`${base} ${sizes[size]} ${variants[variant]} ${className}`}
       disabled={disabled || isLoading}
-      {...props}
+      whileTap={{ scale: 0.97 }}
+      whileHover={{ scale: 1.01 }}
+      transition={{ duration: 0.12 }}
+      {...(props as object)}
     >
       {isLoading ? (
         <>
@@ -56,6 +60,6 @@ export function Button({
       ) : (
         children
       )}
-    </button>
+    </motion.button>
   );
 }

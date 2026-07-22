@@ -4,6 +4,7 @@ import { HttpError } from '../middleware/error.middleware.js';
 import type { AuthenticatedRequest } from '../middleware/auth.middleware.js';
 import { getDashboard } from '../services/dashboard.service.js';
 import { generateText } from '../services/ai.service.js';
+import { logActivity } from '../services/activity.service.js';
 
 function getAuthenticatedUser(req: Request): User {
   const user = (req as AuthenticatedRequest).user;
@@ -59,6 +60,11 @@ Their current workspace summary:
 Provide 2-3 short, practical, and encouraging productivity insights based on this data. Focus on what they can improve or celebrate. Use plain sentences, no markdown, no bullet points, no headers. Keep the total response under 80 words.`;
 
     const result = await generateText({ prompt });
+    await logActivity(user.id, {
+      type: 'ai_summary_generated',
+      title: 'AI summary generated',
+      metadata: { source: 'dashboard_insights' },
+    });
 
     res.status(200).json({ insights: result.text.trim() });
   } catch (error) {

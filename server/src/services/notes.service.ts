@@ -1,15 +1,20 @@
 import { supabaseAdmin } from '../config/supabase.js';
 import { HttpError } from '../middleware/error.middleware.js';
+import { logActivity } from './activity.service.js';
 
 export interface NoteInput {
   title: string;
   content: string;
+  category: string;
+  isPinned: boolean;
 }
 
 interface NoteRecord {
   id: string;
   title: string;
   content: string | null;
+  category: string;
+  is_pinned: boolean;
   user_id: string;
   created_at: string;
   updated_at: string;
@@ -19,17 +24,21 @@ export interface NoteResponse {
   id: string;
   title: string;
   content: string;
+  category: string;
+  isPinned: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
-const noteSelectColumns = 'id, title, content, user_id, created_at, updated_at';
+const noteSelectColumns = 'id, title, content, category, is_pinned, user_id, created_at, updated_at';
 
 function mapNote(record: NoteRecord): NoteResponse {
   return {
     id: record.id,
     title: record.title,
     content: record.content ?? '',
+    category: record.category,
+    isPinned: record.is_pinned,
     createdAt: record.created_at,
     updatedAt: record.updated_at,
   };
@@ -56,6 +65,8 @@ export async function createNote(userId: string, input: NoteInput): Promise<Note
       user_id: userId,
       title: input.title,
       content: input.content,
+      category: input.category,
+      is_pinned: input.isPinned,
     })
     .select(noteSelectColumns)
     .single();
@@ -64,7 +75,14 @@ export async function createNote(userId: string, input: NoteInput): Promise<Note
     throw new HttpError(500, 'Failed to create note', 'Internal Server Error');
   }
 
-  return mapNote(data as NoteRecord);
+  const note = mapNote(data as NoteRecord);
+  await logActivity(userId, {
+    type: 'note_created',
+    title: `Note created: ${note.title}`,
+    metadata: { noteId: note.id },
+  });
+
+  return note;
 }
 
 export async function updateNote(
@@ -77,6 +95,8 @@ export async function updateNote(
     .update({
       title: input.title,
       content: input.content,
+      category: input.category,
+      is_pinned: input.isPinned,
     })
     .eq('id', noteId)
     .eq('user_id', userId)

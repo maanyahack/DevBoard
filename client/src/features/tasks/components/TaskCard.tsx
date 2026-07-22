@@ -17,21 +17,27 @@ interface TaskCardProps {
 }
 
 const statusStyles: Record<TaskStatus, string> = {
-  todo: 'bg-slate-100 text-slate-600 ring-slate-500/15 dark:bg-slate-700/60 dark:text-slate-300 dark:ring-slate-400/20',
-  in_progress: 'bg-sky-50 text-sky-700 ring-sky-500/15 dark:bg-sky-400/10 dark:text-sky-300 dark:ring-sky-400/20',
-  done: 'bg-emerald-50 text-emerald-700 ring-emerald-500/15 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-emerald-400/20',
+  todo: 'bg-slate-100 text-slate-700 ring-slate-500/15 dark:bg-slate-700/60 dark:text-slate-300 dark:ring-slate-400/20',
+  in_progress: 'bg-sky-50 text-sky-700 ring-sky-500/20 dark:bg-sky-400/10 dark:text-sky-300 dark:ring-sky-400/25',
+  done: 'bg-emerald-50 text-emerald-700 ring-emerald-500/20 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-emerald-400/25',
 };
 
 const priorityStyles: Record<TaskPriority, string> = {
-  low: 'bg-teal-50 text-teal-700 ring-teal-500/15 dark:bg-teal-400/10 dark:text-teal-300 dark:ring-teal-400/20',
-  medium: 'bg-amber-50 text-amber-700 ring-amber-500/15 dark:bg-amber-400/10 dark:text-amber-300 dark:ring-amber-400/20',
-  high: 'bg-red-50 text-red-700 ring-red-500/15 dark:bg-red-500/10 dark:text-red-300 dark:ring-red-400/20',
+  low: 'bg-emerald-50 text-emerald-700 ring-emerald-500/15 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-emerald-400/20',
+  medium: 'bg-amber-50 text-amber-700 ring-amber-500/20 dark:bg-amber-400/10 dark:text-amber-300 dark:ring-amber-400/25',
+  high: 'bg-rose-50 text-rose-700 ring-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-400/25',
 };
 
 const priorityDots: Record<TaskPriority, string> = {
-  low: 'bg-teal-500',
+  low: 'bg-emerald-500',
   medium: 'bg-amber-500',
-  high: 'bg-red-500',
+  high: 'bg-rose-500',
+};
+
+const cardAccents: Record<TaskPriority, string> = {
+  low: 'hover:border-emerald-200 dark:hover:border-emerald-500/30',
+  medium: 'hover:border-amber-200 dark:hover:border-amber-500/30',
+  high: 'hover:border-rose-200 dark:hover:border-rose-500/35',
 };
 
 const statusIcons = {
@@ -57,10 +63,10 @@ export function TaskCard({ task, isSelected, selectionMode, onSelect, onEdit, on
 
   return (
     <article
-      className={`group relative rounded-xl border bg-white p-5 shadow-sm transition-all duration-150 dark:bg-slate-800 ${
+      className={`floating-card tilt-card stagger-item group relative rounded-xl border bg-white p-5 shadow-sm shadow-slate-200/50 dark:bg-slate-800 dark:shadow-black/10 ${
         isSelected
           ? 'border-emerald-400 bg-emerald-50/30 ring-2 ring-emerald-400 dark:border-emerald-500 dark:bg-emerald-500/5 dark:ring-emerald-500'
-          : 'border-slate-200 hover:-translate-y-px hover:border-slate-300 hover:shadow-md dark:border-slate-700/80 dark:hover:border-slate-600 dark:hover:shadow-black/20'
+          : `border-slate-200 hover:-translate-y-px hover:shadow-lg hover:shadow-slate-200/70 dark:border-slate-700/80 dark:hover:shadow-black/25 ${cardAccents[task.priority]}`
       }`}
     >
       {/* Checkbox */}
@@ -108,7 +114,7 @@ export function TaskCard({ task, isSelected, selectionMode, onSelect, onEdit, on
           <button
             type="button"
             onClick={() => onEdit(task)}
-            className="rounded-lg p-1.5 text-slate-400 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+            className="pressable rounded-lg p-1.5 text-slate-400 hover:bg-sky-50 hover:text-sky-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:hover:bg-sky-500/10 dark:hover:text-sky-300"
             aria-label="Edit task"
             title="Edit"
           >
@@ -117,7 +123,7 @@ export function TaskCard({ task, isSelected, selectionMode, onSelect, onEdit, on
           <button
             type="button"
             onClick={() => onDelete(task)}
-            className="rounded-lg p-1.5 text-slate-400 transition-colors duration-150 hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 dark:hover:bg-red-500/10 dark:hover:text-red-300"
+            className="pressable rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 dark:hover:bg-red-500/10 dark:hover:text-red-300"
             aria-label="Delete task"
             title="Delete"
           >
@@ -127,7 +133,7 @@ export function TaskCard({ task, isSelected, selectionMode, onSelect, onEdit, on
       </div>
 
       {/* Description */}
-      <p className="mt-3 line-clamp-3 min-h-[3.5rem] text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+      <p className="mt-3 line-clamp-3 min-h-[3.5rem] text-sm leading-relaxed text-slate-600 dark:text-slate-400">
         {task.description || 'No description yet.'}
       </p>
 
@@ -136,7 +142,7 @@ export function TaskCard({ task, isSelected, selectionMode, onSelect, onEdit, on
         <span
           className={`inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset ${
             due.overdue && task.status !== 'done'
-              ? 'bg-red-50 text-red-600 ring-red-500/15 dark:bg-red-500/10 dark:text-red-400 dark:ring-red-400/20'
+              ? 'bg-rose-50 text-rose-700 ring-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-400/25'
               : 'bg-slate-50 text-slate-500 ring-slate-200 dark:bg-slate-700/50 dark:text-slate-400 dark:ring-slate-600/50'
           }`}
         >

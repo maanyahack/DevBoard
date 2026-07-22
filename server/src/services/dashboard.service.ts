@@ -3,11 +3,14 @@ import { HttpError } from '../middleware/error.middleware.js';
 import type { NoteResponse } from './notes.service.js';
 import type { ProjectResponse } from './projects.service.js';
 import type { TaskResponse } from './tasks.service.js';
+import { listActivities, type ActivityResponse } from './activity.service.js';
 
 interface NoteRecord {
   id: string;
   title: string;
   content: string | null;
+  category: string;
+  is_pinned: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -19,6 +22,7 @@ interface TaskRecord {
   status: 'todo' | 'in_progress' | 'done';
   priority: 'low' | 'medium' | 'high';
   due_date: string | null;
+  project_id: string | null;
   sort_order: number | null;
   created_at: string;
   updated_at: string;
@@ -45,19 +49,34 @@ export interface DashboardResponse {
   recentTasks: TaskResponse[];
   recentNotes: NoteResponse[];
   activeProjects: ProjectResponse[];
+  activities: ActivityResponse[];
 }
 
-const noteSelectColumns = 'id, title, content, created_at, updated_at';
+const noteSelectColumns = 'id, title, content, category, is_pinned, created_at, updated_at';
 const taskSelectColumns =
+  'id, title, description, status, priority, due_date, project_id, sort_order, created_at, updated_at';
+const fallbackTaskSelectColumns =
   'id, title, description, status, priority, due_date, sort_order, created_at, updated_at';
 const projectSelectColumns =
   'id, name, description, status, github_url, sort_order, created_at, updated_at';
+
+function isMissingProjectColumn(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const value = error as { code?: string; message?: string };
+  return (
+    value.code === '42703' ||
+    value.code === 'PGRST204' ||
+    Boolean(value.message?.toLowerCase().includes('project_id'))
+  );
+}
 
 function mapNote(record: NoteRecord): NoteResponse {
   return {
     id: record.id,
     title: record.title,
     content: record.content ?? '',
+    category: record.category,
+    isPinned: record.is_pinned,
     createdAt: record.created_at,
     updatedAt: record.updated_at,
   };
@@ -71,6 +90,7 @@ function mapTask(record: TaskRecord): TaskResponse {
     status: record.status,
     priority: record.priority,
     dueDate: record.due_date,
+    projectId: record.project_id,
     sortOrder: record.sort_order ?? 0,
     createdAt: record.created_at,
     updatedAt: record.updated_at,
@@ -117,6 +137,34 @@ async function countCompletedTasks(userId: string): Promise<number> {
   return count ?? 0;
 }
 
+async function fetchRecentTasks(userId: string) {
+  const result = await supabaseAdmin
+    .from('tasks')
+    .select(taskSelectColumns)
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false })
+    .limit(5);
+
+  if (!result.error || !isMissingProjectColumn(result.error)) return result;
+
+  const fallback = await supabaseAdmin
+    .from('tasks')
+    .select(fallbackTaskSelectColumns)
+    .eq('user_id', userId)
+    .order('updated_at', { ascending: false })
+    .limit(5);
+
+  if (fallback.error) return fallback;
+
+  return {
+    ...fallback,
+    data: (fallback.data ?? []).map((record) => ({
+      ...(record as Omit<TaskRecord, 'project_id'>),
+      project_id: null,
+    })),
+  };
+}
+
 export async function getDashboard(userId: string): Promise<DashboardResponse> {
   const [
     projects,
@@ -126,17 +174,13 @@ export async function getDashboard(userId: string): Promise<DashboardResponse> {
     recentTasksResult,
     recentNotesResult,
     activeProjectsResult,
+    activities,
   ] = await Promise.all([
     countRows('projects', userId),
     countRows('tasks', userId),
     countCompletedTasks(userId),
     countRows('notes', userId),
-    supabaseAdmin
-      .from('tasks')
-      .select(taskSelectColumns)
-      .eq('user_id', userId)
-      .order('updated_at', { ascending: false })
-      .limit(5),
+    fetchRecentTasks(userId),
     supabaseAdmin
       .from('notes')
       .select(noteSelectColumns)
@@ -150,6 +194,7 @@ export async function getDashboard(userId: string): Promise<DashboardResponse> {
       .eq('status', 'active')
       .order('updated_at', { ascending: false })
       .limit(5),
+    listActivities(userId, 30),
   ]);
 
   if (recentTasksResult.error || recentNotesResult.error || activeProjectsResult.error) {
@@ -163,5 +208,6 @@ export async function getDashboard(userId: string): Promise<DashboardResponse> {
     activeProjects: (activeProjectsResult.data ?? []).map((record) =>
       mapProject(record as ProjectRecord),
     ),
+    activities,
   };
 }

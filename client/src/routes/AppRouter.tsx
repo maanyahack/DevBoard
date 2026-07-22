@@ -9,9 +9,11 @@ import NotesPage from '@/pages/NotesPage';
 import ProjectsPage from '@/pages/ProjectsPage';
 import TasksPage from '@/pages/TasksPage';
 import ProfilePage from '@/pages/ProfilePage';
+import SettingsPage from '@/pages/SettingsPage';
 
 import ModulePlaceholder from '@/pages/ModulePlaceholder';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { ProtectedRoute } from '@/routes/ProtectedRoute';
 import { PublicOnlyRoute } from '@/routes/PublicOnlyRoute';
 
@@ -19,7 +21,14 @@ export function AppRouter() {
   return (
     <Routes>
       {/* Public */}
-      <Route path="/" element={<LandingPage />} />
+      <Route
+        path="/"
+        element={
+          <ErrorBoundary label="Landing Page">
+            <LandingPage />
+          </ErrorBoundary>
+        }
+      />
       <Route
         path="/login"
         element={
@@ -51,7 +60,9 @@ export function AppRouter() {
       <Route
         element={
           <ProtectedRoute>
-            <DashboardLayout />
+            <ErrorBoundary label="App">
+              <DashboardLayout />
+            </ErrorBoundary>
           </ProtectedRoute>
         }
       >
@@ -63,6 +74,7 @@ export function AppRouter() {
         <Route path="/knowledge" element={<ModulePlaceholder title="Knowledge Vault" />} />
         <Route path="/snippets" element={<ModulePlaceholder title="Snippets" />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/settings" element={<SettingsPage />} />
 
       </Route>
 

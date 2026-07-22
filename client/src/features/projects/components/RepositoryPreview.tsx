@@ -122,7 +122,7 @@ export function RepositoryPreview({ githubUrl }: RepositoryPreviewProps) {
 
   if (repoQuery.isLoading) {
     return (
-      <div className="mt-3 h-[60px] animate-pulse rounded-lg border border-slate-100 bg-slate-100/70 dark:border-slate-700 dark:bg-slate-700/30" />
+      <div className="mt-3 h-[60px] animate-pulse border-t border-slate-200 bg-slate-100/60 pt-3 dark:border-slate-700 dark:bg-slate-700/20" />
     );
   }
 
@@ -143,21 +143,21 @@ export function RepositoryPreview({ githubUrl }: RepositoryPreviewProps) {
     : null;
 
   return (
-    <div className="mt-3 rounded-lg border border-slate-100 bg-slate-50/60 p-3 dark:border-slate-700/60 dark:bg-slate-700/20">
-      <p className="truncate text-[13px] font-semibold text-slate-800 dark:text-slate-200">
+    <div className="stagger-item mt-3 border-t border-slate-200 pt-3 dark:border-slate-700">
+      <p className="truncate text-[13px] font-semibold text-slate-900 dark:text-slate-100">
         {repo.fullName}
       </p>
       {repo.description && (
-        <p className="mt-1 line-clamp-2 text-xs text-slate-500 dark:text-slate-400">
+        <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
           {repo.description}
         </p>
       )}
-      <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 dark:text-slate-400">
-        <span className="inline-flex items-center gap-1">
+      <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+        <span className="inline-flex items-center gap-1 text-amber-600 dark:text-amber-300">
           <Star className="h-3 w-3" />
           {repo.stars.toLocaleString()}
         </span>
-        <span className="inline-flex items-center gap-1">
+        <span className="inline-flex items-center gap-1 text-sky-600 dark:text-sky-300">
           <GitFork className="h-3 w-3" />
           {repo.forks.toLocaleString()}
         </span>
