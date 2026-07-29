@@ -77,6 +77,7 @@ export default function TasksPage() {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [deletingTask, setDeletingTask] = useState<Task | null>(null);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [prefillStatus, setPrefillStatus] = useState<TaskStatus | null>(null);
 
   // Bulk selection state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -150,14 +151,28 @@ export default function TasksPage() {
   });
 
   const mutationError =
-    createMutation.error ?? updateMutation.error ?? deleteMutation.error ?? null;
+    createMutation.error ??
+    updateMutation.error ??
+    deleteMutation.error ??
+    reorderMutation.error ??
+    null;
   const isSaving = createMutation.isPending || updateMutation.isPending;
 
   // ─── Modal handlers ────────────────────────────────────────────────────────
-  function openCreateModal() { setEditingTask(null); setIsTaskModalOpen(true); }
-  function openEditModal(task: Task) { setEditingTask(task); setIsTaskModalOpen(true); }
+  function openCreateModal() {
+    setEditingTask(null);
+    setPrefillStatus(null);
+    setIsTaskModalOpen(true);
+  }
+  function openEditModal(task: Task) {
+    setEditingTask(task);
+    setPrefillStatus(null);
+    setIsTaskModalOpen(true);
+  }
   function closeTaskModal() {
-    setEditingTask(null); setIsTaskModalOpen(false);
+    setEditingTask(null);
+    setIsTaskModalOpen(false);
+    setPrefillStatus(null);
     createMutation.reset(); updateMutation.reset();
   }
   function handleSave(fields: TaskEditableFields) {
@@ -226,6 +241,32 @@ export default function TasksPage() {
         sortOrder: task.sortOrder,
       },
     });
+  }
+
+  // ─── Reorder handler (Kanban drag-and-drop) ───────────────────────────────
+  const reorderMutation = useMutation({
+    mutationFn: async (
+      operations: Array<{ id: string; status: TaskStatus; sortOrder: number }>,
+    ) => {
+      await apiRequest<{ tasks: Task[] }>(
+        '/api/tasks/reorder',
+        requireToken(accessToken),
+        {
+          method: 'PATCH',
+          body: JSON.stringify({ reorders: operations }),
+        },
+      );
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: tasksQueryKey });
+      void queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
+    },
+  });
+
+  function handleReorder(
+    operations: Array<{ id: string; status: TaskStatus; sortOrder: number }>,
+  ) {
+    reorderMutation.mutate(operations);
   }
 
   async function handleBulkDelete() {
@@ -351,7 +392,19 @@ export default function TasksPage() {
 
           {view === 'kanban' && !selectionMode && (
             <Suspense fallback={<TaskViewFallback label="Loading Kanban..." />}>
-              <KanbanBoard tasks={filteredTasks} onEdit={openEditModal} onStatusChange={handleStatusChange} />
+              <KanbanBoard
+                tasks={filteredTasks}
+                onEdit={openEditModal}
+                onReorder={handleReorder}
+                onCreateTask={(status) => {
+                  setEditingTask(null);
+                  setIsTaskModalOpen(true);
+                  // Pre-select the status in the modal via the default
+                  // The modal opens fresh — status defaults to "todo"
+                  // We'll set the initial status via a prefill mechanism
+                  setPrefillStatus(status);
+                }}
+              />
             </Suspense>
           )}
 
@@ -367,6 +420,7 @@ export default function TasksPage() {
         task={editingTask}
         isOpen={isTaskModalOpen}
         isSaving={isSaving}
+        prefillStatus={prefillStatus}
         projects={projectsQuery.data ?? []}
         onClose={closeTaskModal}
         onSave={handleSave}

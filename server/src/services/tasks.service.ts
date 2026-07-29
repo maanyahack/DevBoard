@@ -281,6 +281,58 @@ export async function updateTaskStatus(
   return task;
 }
 
+export interface ReorderOperation {
+  id: string;
+  status: 'todo' | 'in_progress' | 'done';
+  sortOrder: number;
+}
+
+export async function reorderTasks(
+  userId: string,
+  operations: ReorderOperation[],
+): Promise<TaskResponse[]> {
+  const results: TaskResponse[] = [];
+
+  for (const op of operations) {
+    let result = await supabaseAdmin
+      .from('tasks')
+      .update({
+        status: op.status,
+        sort_order: op.sortOrder,
+      })
+      .eq('id', op.id)
+      .eq('user_id', userId)
+      .select(taskSelectColumns)
+      .maybeSingle();
+
+    if (result.error && isMissingProjectColumn(result.error)) {
+      result = await supabaseAdmin
+        .from('tasks')
+        .update({
+          status: op.status,
+          sort_order: op.sortOrder,
+        })
+        .eq('id', op.id)
+        .eq('user_id', userId)
+        .select(fallbackTaskSelectColumns)
+        .maybeSingle();
+    }
+
+    if (result.error) continue;
+    if (!result.data) continue;
+
+    const record = result.data as TaskRecord;
+    results.push(
+      mapTask({
+        ...record,
+        project_id: record.project_id ?? null,
+      }),
+    );
+  }
+
+  return results;
+}
+
 export async function deleteTask(userId: string, taskId: string): Promise<void> {
   const { data, error } = await supabaseAdmin
     .from('tasks')

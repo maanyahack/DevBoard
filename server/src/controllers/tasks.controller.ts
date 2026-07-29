@@ -7,8 +7,10 @@ import {
   createTask,
   deleteTask,
   listTasks,
+  reorderTasks,
   updateTask,
   updateTaskStatus,
+  type ReorderOperation,
 } from '../services/tasks.service.js';
 import { generateText } from '../services/ai.service.js';
 
@@ -108,6 +110,36 @@ export async function deleteTaskById(
     await deleteTask(user.id, req.params.id);
 
     res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+}
+
+const reorderBodySchema = z.object({
+  reorders: z
+    .array(
+      z.object({
+        id: z.string().uuid(),
+        status: z.enum(['todo', 'in_progress', 'done']),
+        sortOrder: z.number().int(),
+      }),
+    )
+    .min(1),
+});
+
+export async function patchTasksReorder(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> {
+  try {
+    const user = getAuthenticatedUser(req);
+    const { reorders } = reorderBodySchema.parse(req.body) as {
+      reorders: ReorderOperation[];
+    };
+    const tasks = await reorderTasks(user.id, reorders);
+
+    res.status(200).json({ tasks });
   } catch (error) {
     next(error);
   }

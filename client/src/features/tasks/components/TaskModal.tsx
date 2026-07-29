@@ -11,6 +11,7 @@ interface TaskModalProps {
   task?: Task | null;
   isOpen: boolean;
   isSaving?: boolean;
+  prefillStatus?: TaskStatus | null;
   projects?: Project[];
   onClose: () => void;
   onSave: (fields: TaskEditableFields) => void;
@@ -41,6 +42,7 @@ export function TaskModal({
   task,
   isOpen,
   isSaving = false,
+  prefillStatus = null,
   projects = [],
   onClose,
   onSave,
@@ -72,13 +74,13 @@ export function TaskModal({
             projectId: task.projectId,
             sortOrder: task.sortOrder,
           }
-        : emptyFields,
+        : { ...emptyFields, status: prefillStatus ?? emptyFields.status },
     );
     setTitleError('');
     setShowAiPanel(false);
     setAiPrompt('');
     setAiError('');
-  }, [isOpen, task]);
+  }, [isOpen, task, prefillStatus]);
 
   // Focus the prompt textarea when the AI panel opens
   useEffect(() => {

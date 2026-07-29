@@ -3,6 +3,7 @@ import {
   deleteTaskById,
   getTasks,
   patchTaskStatus,
+  patchTasksReorder,
   postSuggestTask,
   postTask,
   putTask,
@@ -16,6 +17,7 @@ router.use(requireAuth);
 router.get('/', getTasks);
 router.post('/', postTask);
 router.post('/suggest', postSuggestTask);
+router.patch('/reorder', patchTasksReorder);
 router.patch('/:id/status', patchTaskStatus);
 router.put('/:id', putTask);
 router.delete('/:id', deleteTaskById);
