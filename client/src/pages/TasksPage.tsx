@@ -150,6 +150,26 @@ export default function TasksPage() {
     },
   });
 
+  // ─── Reorder handler (Kanban drag-and-drop) ───────────────────────────────
+  const reorderMutation = useMutation({
+    mutationFn: async (
+      operations: Array<{ id: string; status: TaskStatus; sortOrder: number }>,
+    ) => {
+      await apiRequest<{ tasks: Task[] }>(
+        '/api/tasks/reorder',
+        requireToken(accessToken),
+        {
+          method: 'PATCH',
+          body: JSON.stringify({ reorders: operations }),
+        },
+      );
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: tasksQueryKey });
+      void queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
+    },
+  });
+
   const mutationError =
     createMutation.error ??
     updateMutation.error ??
@@ -242,26 +262,6 @@ export default function TasksPage() {
       },
     });
   }
-
-  // ─── Reorder handler (Kanban drag-and-drop) ───────────────────────────────
-  const reorderMutation = useMutation({
-    mutationFn: async (
-      operations: Array<{ id: string; status: TaskStatus; sortOrder: number }>,
-    ) => {
-      await apiRequest<{ tasks: Task[] }>(
-        '/api/tasks/reorder',
-        requireToken(accessToken),
-        {
-          method: 'PATCH',
-          body: JSON.stringify({ reorders: operations }),
-        },
-      );
-    },
-    onSettled: () => {
-      void queryClient.invalidateQueries({ queryKey: tasksQueryKey });
-      void queryClient.invalidateQueries({ queryKey: dashboardQueryKey });
-    },
-  });
 
   function handleReorder(
     operations: Array<{ id: string; status: TaskStatus; sortOrder: number }>,

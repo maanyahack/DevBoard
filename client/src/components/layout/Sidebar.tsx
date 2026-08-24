@@ -7,16 +7,6 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-/*
-  Sidebar palette — slate-blue:
-  Light: hsl(226 32% 18%)  — deep blue-slate panel
-  Dark:  hsl(226 28% 12%)  — deeper, near-navy
-
-  Nav item states are tuned for legibility on this dark surface.
-  Active pill: translucent indigo/white tint.
-  Hover: slightly lighter panel tint.
-*/
-
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   return (
     <>
@@ -37,24 +27,24 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
       </AnimatePresence>
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200/70 bg-[hsl(226_22%_95%)] shadow-[1px_0_0_0_hsl(220_13%_88%)] backdrop-blur-xl transition-transform duration-200 ease-out lg:translate-x-0 dark:border-white/[0.06] dark:bg-[hsl(226_24%_12%)] dark:shadow-[2px_0_20px_0_hsl(226_40%_4%/0.4)] ${
+        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-slate-200/70 bg-[hsl(226_22%_96%)] shadow-[1px_0_0_0_hsl(220_13%_89%)] backdrop-blur-xl transition-transform duration-200 ease-out lg:translate-x-0 dark:border-white/[0.055] dark:bg-[hsl(226_26%_10%)] dark:shadow-[2px_0_28px_0_hsl(226_40%_4%/0.5)] ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Brand */}
-        <div className="flex h-14 shrink-0 items-center gap-3 border-b border-slate-200/70 px-4 dark:border-white/[0.07]">
-          <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-600 text-[15px] font-bold tracking-tight text-white shadow-[0_1px_8px_0_hsl(160_84%_39%/0.40)]">
+        <div className="flex h-14 shrink-0 items-center gap-3 border-b border-slate-200/70 px-4 dark:border-white/[0.06]">
+          <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-700 text-[15px] font-bold tracking-tight text-white shadow-[0_1px_10px_0_hsl(160_84%_39%/0.45)]">
             ◈
           </span>
-          <span className="text-[15px] font-semibold tracking-tight text-slate-800 dark:text-white/90">
-            DevNest
+          <span className="text-[15px] font-bold tracking-tight text-slate-800 dark:text-white/90">
+            DevBoard
           </span>
         </div>
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto p-2 pt-3">
           <p className="mb-1.5 px-3 text-[10px] font-semibold uppercase tracking-widest text-slate-400 dark:text-white/25">
-            Menu
+            Workspace
           </p>
           {navItems.map((item) => (
             <NavLink
@@ -76,7 +66,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   {isActive && (
                     <motion.span
                       layoutId="sidebar-active-bg"
-                      className="absolute inset-0 rounded-lg border border-slate-300/60 bg-white shadow-sm dark:border-white/10 dark:bg-white/10 dark:shadow-none"
+                      className="absolute inset-0 rounded-lg border border-slate-300/60 bg-white shadow-[var(--shadow-sm)] dark:border-white/10 dark:bg-white/10 dark:shadow-none"
                       transition={{ type: 'spring', stiffness: 400, damping: 40 }}
                     />
                   )}
@@ -86,7 +76,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                   {isActive && (
                     <motion.span
                       layoutId="sidebar-active-bar"
-                      className="absolute -left-0.5 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-emerald-500 dark:bg-emerald-400"
+                      className="absolute -left-0.5 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-gradient-to-b from-emerald-400 to-emerald-600 dark:from-emerald-300 dark:to-emerald-500"
                       transition={{ type: 'spring', stiffness: 400, damping: 40 }}
                     />
                   )}
@@ -107,10 +97,13 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
         </nav>
 
         {/* Footer */}
-        <div className="shrink-0 border-t border-slate-200/70 px-4 py-3 dark:border-white/[0.07]">
-          <p className="font-mono text-[10px] text-slate-400 dark:text-white/25">
-            DevNest v0.2 · Milestone 2
-          </p>
+        <div className="shrink-0 border-t border-slate-200/70 px-4 py-3.5 dark:border-white/[0.06]">
+          <div className="flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 ring-2 ring-emerald-500/25 dark:bg-emerald-400 dark:ring-emerald-400/25" />
+            <p className="font-mono text-[10px] text-slate-400 dark:text-white/25">
+              DevBoard v0.2 · All systems operational
+            </p>
+          </div>
         </div>
       </aside>
     </>

@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '../config/supabase.js';
 import { HttpError } from '../middleware/error.middleware.js';
 import { logActivity } from './activity.service.js';
+import { sanitizePlainText, sanitizeContent } from '../lib/sanitize.js';
 
 export interface TaskInput {
   title: string;
@@ -117,12 +118,15 @@ export async function listTasks(
 }
 
 export async function createTask(userId: string, input: TaskInput): Promise<TaskResponse> {
+  const safeTitle = sanitizePlainText(input.title);
+  const safeDescription = sanitizeContent(input.description);
+
   let result = await supabaseAdmin
     .from('tasks')
     .insert({
       user_id: userId,
-      title: input.title,
-      description: input.description,
+      title: safeTitle,
+      description: safeDescription,
       status: input.status,
       priority: input.priority,
       due_date: input.dueDate,
@@ -137,8 +141,8 @@ export async function createTask(userId: string, input: TaskInput): Promise<Task
       .from('tasks')
       .insert({
         user_id: userId,
-        title: input.title,
-        description: input.description,
+        title: safeTitle,
+        description: safeDescription,
         status: input.status,
         priority: input.priority,
         due_date: input.dueDate,
@@ -180,11 +184,14 @@ export async function updateTask(
     throw new HttpError(500, 'Failed to update task', 'Internal Server Error');
   }
 
+  const safeTitle = sanitizePlainText(input.title);
+  const safeDescription = sanitizeContent(input.description);
+
   let result = await supabaseAdmin
     .from('tasks')
     .update({
-      title: input.title,
-      description: input.description,
+      title: safeTitle,
+      description: safeDescription,
       status: input.status,
       priority: input.priority,
       due_date: input.dueDate,
@@ -200,8 +207,8 @@ export async function updateTask(
     result = await supabaseAdmin
       .from('tasks')
       .update({
-        title: input.title,
-        description: input.description,
+        title: safeTitle,
+        description: safeDescription,
         status: input.status,
         priority: input.priority,
         due_date: input.dueDate,

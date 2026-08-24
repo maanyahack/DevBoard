@@ -1,9 +1,10 @@
 import { createApp } from './app.js';
 import { env } from './config/env.js';
+import { logger } from './config/logger.js';
 
 const app = createApp();
 
 app.listen(env.PORT, () => {
-  console.log(`DevBoard server running on http://localhost:${env.PORT}`);
-  console.log(`Health check: http://localhost:${env.PORT}/api/health`);
+  logger.info(`DevBoard server running on http://localhost:${env.PORT}`);
+  logger.info(`Health check: http://localhost:${env.PORT}/api/health`);
 });

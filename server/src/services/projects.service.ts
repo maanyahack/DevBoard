@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '../config/supabase.js';
 import { HttpError } from '../middleware/error.middleware.js';
 import { logActivity } from './activity.service.js';
+import { sanitizePlainText, sanitizeContent } from '../lib/sanitize.js';
 
 export interface ProjectInput {
   name: string;
@@ -68,12 +69,15 @@ export async function createProject(
   userId: string,
   input: ProjectInput,
 ): Promise<ProjectResponse> {
+  const safeName = sanitizePlainText(input.name);
+  const safeDescription = sanitizeContent(input.description);
+
   const { data, error } = await supabaseAdmin
     .from('projects')
     .insert({
       user_id: userId,
-      name: input.name,
-      description: input.description,
+      name: safeName,
+      description: safeDescription,
       status: input.status,
       github_url: input.githubUrl,
       sort_order: input.sortOrder,
@@ -100,11 +104,14 @@ export async function updateProject(
   projectId: string,
   input: ProjectInput,
 ): Promise<ProjectResponse> {
+  const safeName = sanitizePlainText(input.name);
+  const safeDescription = sanitizeContent(input.description);
+
   const { data, error } = await supabaseAdmin
     .from('projects')
     .update({
-      name: input.name,
-      description: input.description,
+      name: safeName,
+      description: safeDescription,
       status: input.status,
       github_url: input.githubUrl,
       sort_order: input.sortOrder,

@@ -12,7 +12,9 @@ export function Navbar({ onMenuClick, onSearchOpen }: NavbarProps) {
 
   return (
     <header className="sticky top-0 z-20 border-b border-[var(--border-subtle)] bg-[var(--surface-overlay)] backdrop-blur-md">
-      {/* Hairline bottom separator with color */}
+      {/* Subtle gradient accent under header */}
+      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent dark:via-emerald-500/15" />
+
       <div className="flex h-14 items-center gap-3 px-4 sm:gap-4 sm:px-5">
         {/* Mobile menu toggle */}
         <button
@@ -64,7 +66,7 @@ export function Navbar({ onMenuClick, onSearchOpen }: NavbarProps) {
             {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
 
-          {/* Notifications (UI placeholder) */}
+          {/* Notifications */}
           <button
             className="pressable relative rounded-lg border border-transparent p-1.5 text-slate-500 hover:border-[var(--border-subtle)] hover:bg-slate-100/80 hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:text-slate-400 dark:hover:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-100"
             aria-label="Notifications"

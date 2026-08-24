@@ -17,33 +17,33 @@ interface TaskCardProps {
 }
 
 const statusStyles: Record<TaskStatus, string> = {
-  todo: 'bg-slate-100 text-slate-700 ring-slate-500/15 dark:bg-slate-700/60 dark:text-slate-300 dark:ring-slate-400/20',
+  todo:        'bg-slate-100 text-slate-700 ring-slate-500/15 dark:bg-slate-700/60 dark:text-slate-300 dark:ring-slate-400/20',
   in_progress: 'bg-sky-50 text-sky-700 ring-sky-500/20 dark:bg-sky-400/10 dark:text-sky-300 dark:ring-sky-400/25',
-  done: 'bg-emerald-50 text-emerald-700 ring-emerald-500/20 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-emerald-400/25',
+  done:        'bg-emerald-50 text-emerald-700 ring-emerald-500/20 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-emerald-400/25',
 };
 
 const priorityStyles: Record<TaskPriority, string> = {
-  low: 'bg-emerald-50 text-emerald-700 ring-emerald-500/15 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-emerald-400/20',
+  low:    'bg-emerald-50 text-emerald-700 ring-emerald-500/15 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-emerald-400/20',
   medium: 'bg-amber-50 text-amber-700 ring-amber-500/20 dark:bg-amber-400/10 dark:text-amber-300 dark:ring-amber-400/25',
-  high: 'bg-rose-50 text-rose-700 ring-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-400/25',
+  high:   'bg-rose-50 text-rose-700 ring-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-400/25',
 };
 
 const priorityDots: Record<TaskPriority, string> = {
-  low: 'bg-emerald-500',
+  low:    'bg-emerald-500',
   medium: 'bg-amber-500',
-  high: 'bg-rose-500',
+  high:   'bg-rose-500',
 };
 
-const cardAccents: Record<TaskPriority, string> = {
-  low: 'hover:border-emerald-200 dark:hover:border-emerald-500/30',
-  medium: 'hover:border-amber-200 dark:hover:border-amber-500/30',
-  high: 'hover:border-rose-200 dark:hover:border-rose-500/35',
+const cardPriorityBorder: Record<TaskPriority, string> = {
+  low:    'hover:border-emerald-200/80 dark:hover:border-emerald-500/30',
+  medium: 'hover:border-amber-200/80 dark:hover:border-amber-500/30',
+  high:   'hover:border-rose-200/80 dark:hover:border-rose-500/35',
 };
 
 const statusIcons = {
-  todo: Circle,
+  todo:        Circle,
   in_progress: Clock3,
-  done: CheckCircle2,
+  done:        CheckCircle2,
 };
 
 function formatDueDate(value: string | null): { label: string; overdue: boolean } {
@@ -63,10 +63,10 @@ export function TaskCard({ task, isSelected, selectionMode, onSelect, onEdit, on
 
   return (
     <article
-      className={`floating-card tilt-card stagger-item group relative rounded-xl border bg-white p-5 shadow-sm shadow-slate-200/50 dark:bg-slate-800 dark:shadow-black/10 ${
+      className={`floating-card stagger-item group relative rounded-xl border bg-[var(--surface-card)] p-5 shadow-[var(--shadow-sm)] transition-all duration-200 ${
         isSelected
           ? 'border-emerald-400 bg-emerald-50/30 ring-2 ring-emerald-400 dark:border-emerald-500 dark:bg-emerald-500/5 dark:ring-emerald-500'
-          : `border-slate-200 hover:-translate-y-px hover:shadow-lg hover:shadow-slate-200/70 dark:border-slate-700/80 dark:hover:shadow-black/25 ${cardAccents[task.priority]}`
+          : `border-[var(--border-subtle)] hover:shadow-[var(--shadow-card-hover)] dark:border-[var(--border-subtle)] ${cardPriorityBorder[task.priority]}`
       }`}
     >
       {/* Checkbox */}
@@ -110,7 +110,7 @@ export function TaskCard({ task, isSelected, selectionMode, onSelect, onEdit, on
         </div>
 
         {/* Actions — visible on hover */}
-        <div className="flex items-center gap-0.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+        <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
           <button
             type="button"
             onClick={() => onEdit(task)}
@@ -133,17 +133,17 @@ export function TaskCard({ task, isSelected, selectionMode, onSelect, onEdit, on
       </div>
 
       {/* Description */}
-      <p className="mt-3 line-clamp-3 min-h-[3.5rem] text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+      <p className="mt-3 line-clamp-3 min-h-[3.5rem] text-sm leading-relaxed text-[var(--text-secondary)]">
         {task.description || 'No description yet.'}
       </p>
 
       {/* Footer */}
-      <div className="mt-4 border-t border-slate-100 pt-3.5 dark:border-slate-700/60">
+      <div className="mt-4 border-t border-[var(--border-subtle)] pt-3.5">
         <span
           className={`inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-medium ring-1 ring-inset ${
             due.overdue && task.status !== 'done'
               ? 'bg-rose-50 text-rose-700 ring-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-400/25'
-              : 'bg-slate-50 text-slate-500 ring-slate-200 dark:bg-slate-700/50 dark:text-slate-400 dark:ring-slate-600/50'
+              : 'bg-[var(--surface-raised)] text-[var(--text-muted)] ring-[var(--border-subtle)]'
           }`}
         >
           <CalendarDays className="h-3 w-3" />

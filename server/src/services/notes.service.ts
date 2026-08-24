@@ -1,6 +1,7 @@
 import { supabaseAdmin } from '../config/supabase.js';
 import { HttpError } from '../middleware/error.middleware.js';
 import { logActivity } from './activity.service.js';
+import { sanitizeContent, sanitizePlainText } from '../lib/sanitize.js';
 
 export interface NoteInput {
   title: string;
@@ -59,13 +60,17 @@ export async function listNotes(userId: string): Promise<NoteResponse[]> {
 }
 
 export async function createNote(userId: string, input: NoteInput): Promise<NoteResponse> {
+  const safeTitle = sanitizePlainText(input.title);
+  const safeContent = sanitizeContent(input.content);
+  const safeCategory = sanitizePlainText(input.category);
+
   const { data, error } = await supabaseAdmin
     .from('notes')
     .insert({
       user_id: userId,
-      title: input.title,
-      content: input.content,
-      category: input.category,
+      title: safeTitle,
+      content: safeContent,
+      category: safeCategory,
       is_pinned: input.isPinned,
     })
     .select(noteSelectColumns)
@@ -90,12 +95,16 @@ export async function updateNote(
   noteId: string,
   input: NoteInput,
 ): Promise<NoteResponse> {
+  const safeTitle = sanitizePlainText(input.title);
+  const safeContent = sanitizeContent(input.content);
+  const safeCategory = sanitizePlainText(input.category);
+
   const { data, error } = await supabaseAdmin
     .from('notes')
     .update({
-      title: input.title,
-      content: input.content,
-      category: input.category,
+      title: safeTitle,
+      content: safeContent,
+      category: safeCategory,
       is_pinned: input.isPinned,
     })
     .eq('id', noteId)

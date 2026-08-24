@@ -1,4 +1,5 @@
-import { CalendarDays, Columns3, List, Search } from 'lucide-react';
+import type { FC } from 'react';
+import { CalendarDays, Search } from 'lucide-react';
 import type { Project } from '@/features/projects/types';
 import type { PriorityFilter, TaskView } from '@/features/tasks/utils';
 
@@ -14,11 +15,36 @@ interface TaskToolbarProps {
   onPriorityChange: (value: PriorityFilter) => void;
 }
 
-const views: Array<{ value: TaskView; label: string; icon: typeof List }> = [
-  { value: 'list', label: 'List', icon: List },
-  { value: 'kanban', label: 'Kanban', icon: Columns3 },
-  { value: 'calendar', label: 'Calendar', icon: CalendarDays },
+const views: Array<{ value: TaskView; label: string; icon: FC<{ className?: string }> }> = [
+  {
+    value: 'list',
+    label: 'List',
+    icon: ({ className }) => (
+      <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+        <path d="M3 4h10M3 8h10M3 12h10" />
+      </svg>
+    ),
+  },
+  {
+    value: 'kanban',
+    label: 'Kanban',
+    icon: ({ className }) => (
+      <svg className={className} viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round">
+        <rect x="1" y="2" width="4" height="12" rx="1" />
+        <rect x="6" y="2" width="4" height="8" rx="1" />
+        <rect x="11" y="2" width="4" height="10" rx="1" />
+      </svg>
+    ),
+  },
+  {
+    value: 'calendar',
+    label: 'Calendar',
+    icon: CalendarDays,
+  },
 ];
+
+const selectClass =
+  'h-10 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] px-3 text-[13px] font-medium text-slate-900 shadow-[var(--shadow-sm)] outline-none transition-all duration-150 hover:border-[var(--border-soft)] focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-300/40 dark:text-slate-100 dark:focus:border-emerald-500/40 dark:focus:ring-emerald-500/20';
 
 export function TaskToolbar({
   view,
@@ -33,8 +59,9 @@ export function TaskToolbar({
 }: TaskToolbarProps) {
   return (
     <div className="mt-6 space-y-4">
+      {/* View switcher */}
       <div className="flex flex-wrap items-center gap-2">
-        <div className="floating-card inline-flex rounded-lg border border-slate-200 bg-white p-1 shadow-sm shadow-slate-200/50 dark:border-slate-700 dark:bg-slate-800 dark:shadow-black/10">
+        <div className="floating-card inline-flex rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] p-1 shadow-[var(--shadow-sm)]">
           {views.map((item) => {
             const Icon = item.icon;
             const active = view === item.value;
@@ -43,10 +70,10 @@ export function TaskToolbar({
                 key={item.value}
                 type="button"
                 onClick={() => onViewChange(item.value)}
-                className={`pressable inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold ${
+                className={`pressable inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all duration-150 ${
                   active
-                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300'
-                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700/70 dark:hover:text-slate-100'
+                    ? 'bg-emerald-500 text-white shadow-[0_1px_4px_0_hsl(160_84%_39%/0.3)]'
+                    : 'text-slate-500 hover:bg-[var(--surface-raised)] hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700/70 dark:hover:text-slate-100'
                 }`}
               >
                 <Icon className="h-3.5 w-3.5" />
@@ -57,20 +84,23 @@ export function TaskToolbar({
         </div>
       </div>
 
+      {/* Search + filters */}
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_180px]">
+        {/* Search input */}
         <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors duration-150 group-focus-within:text-emerald-500" />
           <input
             value={search}
-            onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Search tasks"
-            className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm text-slate-900 shadow-sm shadow-slate-200/40 outline-none transition focus:ring-2 focus:ring-emerald-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:shadow-black/10"
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search tasks…"
+            className="field-focus-ring h-10 w-full rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] pl-9 pr-3 text-[13px] font-medium text-slate-900 shadow-[var(--shadow-sm)] outline-none transition-all duration-150 hover:border-[var(--border-soft)] placeholder:text-slate-400/75 dark:text-slate-100"
           />
         </div>
+
         <select
           value={projectId}
-          onChange={(event) => onProjectChange(event.target.value)}
-          className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm shadow-slate-200/40 outline-none transition focus:ring-2 focus:ring-emerald-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:shadow-black/10"
+          onChange={(e) => onProjectChange(e.target.value)}
+          className={selectClass}
         >
           <option value="all">All projects</option>
           {projects.map((project) => (
@@ -79,10 +109,11 @@ export function TaskToolbar({
             </option>
           ))}
         </select>
+
         <select
           value={priority}
-          onChange={(event) => onPriorityChange(event.target.value as PriorityFilter)}
-          className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm shadow-slate-200/40 outline-none transition focus:ring-2 focus:ring-emerald-300 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:shadow-black/10"
+          onChange={(e) => onPriorityChange(e.target.value as PriorityFilter)}
+          className={selectClass}
         >
           <option value="all">All priorities</option>
           <option value="high">High priority</option>
