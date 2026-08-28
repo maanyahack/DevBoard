@@ -11,7 +11,7 @@ import type { Project, ProjectEditableFields, ProjectStatus } from '@/features/p
 
 const dashboardQueryKey = ['dashboard'];
 const projectsQueryKey = ['projects'];
-const apiBaseUrl = import.meta.env.VITE_API_URL.replace(/\/$/, '');
+const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
 
 type SortKey = 'status' | 'updatedAt' | 'alpha';
 

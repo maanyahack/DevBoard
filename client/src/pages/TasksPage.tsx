@@ -450,7 +450,7 @@ function SortDropdown({
       id={id}
       value={value}
       onChange={(e) => onChange(e.target.value as SortKey)}
-      className="h-9 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-300 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-100"
+      className="h-9 cursor-pointer rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:ring-2 focus:ring-emerald-300 dark:border-slate-600 dark:bg-slate-700/50 dark:text-white [&>option]:dark:bg-slate-800 [&>option]:dark:text-white"
     >
       <option value="priority">Priority</option>
       <option value="dueDate">Due Date</option>

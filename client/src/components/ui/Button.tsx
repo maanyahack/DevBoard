@@ -11,7 +11,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const base =
-  'relative inline-flex items-center justify-center gap-2 rounded-xl font-semibold select-none ' +
+  'relative inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl font-semibold select-none ' +
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ' +
   'disabled:pointer-events-none disabled:opacity-55 disabled:shadow-none ' +
   'tracking-tight whitespace-nowrap';

@@ -44,7 +44,7 @@ const views: Array<{ value: TaskView; label: string; icon: FC<{ className?: stri
 ];
 
 const selectClass =
-  'h-10 rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] px-3 text-[13px] font-medium text-slate-900 shadow-[var(--shadow-sm)] outline-none transition-all duration-150 hover:border-[var(--border-soft)] focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-300/40 dark:text-slate-100 dark:focus:border-emerald-500/40 dark:focus:ring-emerald-500/20';
+  'h-10 cursor-pointer rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] px-3 text-[13px] font-medium text-slate-900 shadow-[var(--shadow-sm)] outline-none transition-all duration-150 hover:border-[var(--border-soft)] focus:border-emerald-400/60 focus:ring-2 focus:ring-emerald-300/40 dark:text-white dark:focus:border-emerald-500/40 dark:focus:ring-emerald-500/20 [&>option]:dark:bg-slate-800 [&>option]:dark:text-white';
 
 export function TaskToolbar({
   view,
@@ -70,10 +70,10 @@ export function TaskToolbar({
                 key={item.value}
                 type="button"
                 onClick={() => onViewChange(item.value)}
-                className={`pressable inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all duration-150 ${
+                className={`pressable cursor-pointer inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold transition-all duration-150 ${
                   active
                     ? 'bg-emerald-500 text-white shadow-[0_1px_4px_0_hsl(160_84%_39%/0.3)]'
-                    : 'text-slate-500 hover:bg-[var(--surface-raised)] hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-700/70 dark:hover:text-slate-100'
+                    : 'text-slate-500 hover:bg-[var(--surface-raised)] hover:text-slate-900 dark:text-white dark:hover:bg-slate-700/70 dark:hover:text-white'
                 }`}
               >
                 <Icon className="h-3.5 w-3.5" />
@@ -88,12 +88,12 @@ export function TaskToolbar({
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_180px]">
         {/* Search input */}
         <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors duration-150 group-focus-within:text-emerald-500" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-colors duration-150 group-focus-within:text-emerald-500 dark:text-white/70 dark:group-focus-within:text-emerald-400" />
           <input
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search tasks…"
-            className="field-focus-ring h-10 w-full rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] pl-9 pr-3 text-[13px] font-medium text-slate-900 shadow-[var(--shadow-sm)] outline-none transition-all duration-150 hover:border-[var(--border-soft)] placeholder:text-slate-400/75 dark:text-slate-100"
+            className="field-focus-ring h-10 w-full cursor-text rounded-lg border border-[var(--border-subtle)] bg-[var(--surface-card)] pl-9 pr-3 text-[13px] font-medium text-slate-900 shadow-[var(--shadow-sm)] outline-none transition-all duration-150 hover:border-[var(--border-soft)] placeholder:text-slate-400/75 dark:text-white dark:placeholder:text-white/70"
           />
         </div>
 

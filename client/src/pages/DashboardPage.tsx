@@ -22,7 +22,7 @@ import { projectStatusLabels } from '@/features/projects/types';
 import { taskPriorityLabels, taskStatusLabels } from '@/features/tasks/types';
 
 const dashboardQueryKey = ['dashboard'];
-const apiBaseUrl = import.meta.env.VITE_API_URL.replace(/\/$/, '');
+const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:4000').replace(/\/$/, '');
 
 function requireToken(token: string | undefined): string {
   if (!token) throw new Error('Authentication required.');

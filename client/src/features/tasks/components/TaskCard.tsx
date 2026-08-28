@@ -48,7 +48,8 @@ const statusIcons = {
 
 function formatDueDate(value: string | null): { label: string; overdue: boolean } {
   if (!value) return { label: 'No due date', overdue: false };
-  const date = new Date(`${value}T00:00:00`);
+  const date = new Date(value.includes('T') ? value : `${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return { label: 'No due date', overdue: false };
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   return {
@@ -114,7 +115,7 @@ export function TaskCard({ task, isSelected, selectionMode, onSelect, onEdit, on
           <button
             type="button"
             onClick={() => onEdit(task)}
-            className="pressable rounded-lg p-1.5 text-slate-400 hover:bg-sky-50 hover:text-sky-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:hover:bg-sky-500/10 dark:hover:text-sky-300"
+            className="pressable cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-sky-50 hover:text-sky-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:hover:bg-sky-500/10 dark:hover:text-sky-300"
             aria-label="Edit task"
             title="Edit"
           >
@@ -123,7 +124,7 @@ export function TaskCard({ task, isSelected, selectionMode, onSelect, onEdit, on
           <button
             type="button"
             onClick={() => onDelete(task)}
-            className="pressable rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 dark:hover:bg-red-500/10 dark:hover:text-red-300"
+            className="pressable cursor-pointer rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 dark:hover:bg-red-500/10 dark:hover:text-red-300"
             aria-label="Delete task"
             title="Delete"
           >

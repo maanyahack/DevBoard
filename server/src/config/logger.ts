@@ -3,6 +3,15 @@ import { env } from './env.js';
 
 export const logger = pino({
   level: env.NODE_ENV === 'production' ? 'info' : 'debug',
+  redact: {
+    paths: [
+      'req.headers.authorization',
+      'req.headers.cookie',
+      'req.headers.x-api-key',
+      'res.headers.set-cookie',
+    ],
+    censor: '[REDACTED]',
+  },
   transport:
     env.NODE_ENV !== 'production'
       ? {

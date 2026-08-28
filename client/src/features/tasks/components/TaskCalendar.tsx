@@ -98,7 +98,7 @@ export default function TaskCalendar({ tasks }: TaskCalendarProps) {
                 key={key}
                 type="button"
                 onClick={() => setSelectedDate(key)}
-                className={`pressable min-h-24 border-b border-r border-slate-100 p-2 text-left last:border-r-0 dark:border-slate-700/60 ${
+                className={`pressable min-h-24 cursor-pointer border-b border-r border-slate-100 p-2 text-left last:border-r-0 dark:border-slate-700/60 ${
                   selected
                     ? 'bg-emerald-50/70 dark:bg-emerald-500/10'
                     : 'hover:bg-slate-50 dark:hover:bg-slate-700/30'
