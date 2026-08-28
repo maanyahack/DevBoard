@@ -1,40 +1,61 @@
+// Import Component (base class for class components) and React types.
+// Error boundaries MUST be class components in React (hooks can't catch render errors).
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+// Import the RefreshCw icon (a circular arrow) for the reload button.
 import { RefreshCw } from 'lucide-react';
 
+// Props interface — the ErrorBoundary accepts children and an optional label.
 interface ErrorBoundaryProps {
-  children: ReactNode;
+  children: ReactNode;         // The components to protect from errors
   /** Optional label for the error context e.g. "Notes", "Dashboard" */
-  label?: string;
+  label?: string;              // Shown in the error message for context
 }
 
+// State interface — tracks whether an error has occurred and what the error was.
 interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
+  hasError: boolean;           // Whether an error was caught
+  error: Error | null;         // The actual error object (for displaying details)
 }
 
 /**
- * Catches unhandled render errors in its subtree and shows a polished
- * fallback instead of letting the whole app white-screen.
+ * ErrorBoundary — a class component that catches unhandled render errors.
+ *
+ * React class components have two special lifecycle methods for error handling:
+ * - getDerivedStateFromError: called when a child throws during rendering.
+ *   Updates state to show the fallback UI.
+ * - componentDidCatch: called after the error is caught.
+ *   Used for error logging/reporting.
+ *
+ * This prevents the entire app from "white-screening" when one component crashes.
  */
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  // Constructor — initializes state.
   constructor(props: ErrorBoundaryProps) {
-    super(props);
+    super(props);  // Call the parent Component constructor
     this.state = { hasError: false, error: null };
   }
 
+  // Static lifecycle method — called when a child throws an error during rendering.
+  // Returns the new state (hasError: true, error: the thrown error).
+  // This is a static method — it doesn't have access to 'this'.
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
+  // Called after the error is caught — used for logging.
+  // 'error' is the actual error, 'info' contains the component stack trace.
   componentDidCatch(error: Error, info: ErrorInfo): void {
+    // Log the error with context (which section of the app crashed).
     console.error(`[ErrorBoundary${this.props.label ? `:${this.props.label}` : ''}]`, error, info.componentStack);
   }
 
+  // Render method — decides what to show based on the error state.
   render(): ReactNode {
+    // If an error was caught, show the polished error fallback UI.
     if (this.state.hasError) {
       return (
         <div className="relative isolate flex min-h-dvh items-center justify-center overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100 p-6 dark:from-slate-950 dark:to-slate-900">
-          {/* Decorative gradient orbs */}
+          {/* Decorative gradient orbs — ambient background decoration. */}
           <div
             className="pointer-events-none absolute -left-32 -top-32 h-80 w-80 rounded-full opacity-[0.08] blur-3xl dark:opacity-[0.12]"
             style={{ background: 'radial-gradient(circle, rgb(16 185 129), transparent 70%)' }}
@@ -46,7 +67,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             aria-hidden="true"
           />
 
-          {/* Subtle grid overlay */}
+          {/* Subtle grid overlay — decorative background pattern. */}
           <div
             className="pointer-events-none absolute inset-0"
             style={{
@@ -58,18 +79,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
             aria-hidden="true"
           />
 
-          {/* Card */}
+          {/* Error card — the main content shown to the user. */}
           <div className="page-enter relative max-w-md rounded-2xl border border-slate-200/70 bg-white/90 p-8 shadow-xl shadow-slate-200/60 backdrop-blur-xl dark:border-slate-700/60 dark:bg-slate-900/90 dark:shadow-black/30" role="alert">
-            {/* Icon with soft glow */}
+            {/* Error icon — red circle with an exclamation mark. */}
             <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 shadow-sm shadow-rose-200/60 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:shadow-rose-500/10 dark:ring-rose-500/25">
               <svg
                 className="h-7 w-7 text-rose-600 dark:text-rose-400"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.75"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+                viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"
               >
                 <circle cx="12" cy="12" r="10" />
                 <path d="M12 8v4M12 16h.01" />
@@ -80,6 +96,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-slate-50">
                 Something went wrong
               </h2>
+              {/* Context-specific error message — uses the label prop if provided. */}
               <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                 {this.props.label
                   ? `An error occurred while rendering ${this.props.label}.`
@@ -90,30 +107,27 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
               </p>
             </div>
 
-            {/* Error details (collapsible) */}
+            {/* Collapsible error details — users can expand to see the actual error message. */}
             {this.state.error && (
               <details className="group mt-6 rounded-xl border border-slate-100 bg-slate-50/70 transition-colors duration-150 hover:border-slate-200 dark:border-slate-700/60 dark:bg-slate-800/50 dark:hover:border-slate-600">
                 <summary className="flex cursor-pointer items-center justify-between px-4 py-3 text-xs font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200">
                   <span>Error details</span>
+                  {/* Chevron icon that rotates when expanded. */}
                   <svg
                     className="h-3.5 w-3.5 transition-transform duration-150 group-open:rotate-180"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
                   >
                     <path d="m6 9 6 6 6-6" />
                   </svg>
                 </summary>
+                {/* The actual error message in a monospace code block. */}
                 <pre className="max-h-40 overflow-auto border-t border-slate-100 px-4 py-3 font-mono text-xs leading-relaxed text-slate-600 dark:border-slate-700/60 dark:text-slate-300">
                   {this.state.error.message}
                 </pre>
               </details>
             )}
 
-            {/* Reload button */}
+            {/* Reload button — refreshes the entire page to try again. */}
             <button
               type="button"
               onClick={() => window.location.reload()}
@@ -127,6 +141,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       );
     }
 
+    // No error — render the children normally (the app works fine).
     return this.props.children;
   }
 }

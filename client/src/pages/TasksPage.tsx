@@ -248,21 +248,6 @@ export default function TasksPage() {
     clearSelection();
   }
 
-  function handleStatusChange(task: Task, status: TaskStatus) {
-    updateMutation.mutate({
-      taskId: task.id,
-      fields: {
-        title: task.title,
-        description: task.description,
-        status,
-        priority: task.priority,
-        dueDate: task.dueDate,
-        projectId: task.projectId,
-        sortOrder: task.sortOrder,
-      },
-    });
-  }
-
   function handleReorder(
     operations: Array<{ id: string; status: TaskStatus; sortOrder: number }>,
   ) {
