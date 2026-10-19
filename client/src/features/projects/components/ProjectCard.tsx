@@ -1,21 +1,35 @@
-import { Archive, CheckCircle2, ExternalLink, FolderKanban, Pencil, Rocket, Trash2 } from 'lucide-react';
+import {
+  Archive,
+  CheckCircle2,
+  ExternalLink,
+  FolderKanban,
+  Pencil,
+  Rocket,
+  Sparkles,
+  Trash2,
+} from 'lucide-react';
 import {
   projectStatusLabels,
   type Project,
   type ProjectStatus,
 } from '@/features/projects/types';
+import { RepositoryPreview } from '@/features/projects/components/RepositoryPreview';
 
 interface ProjectCardProps {
   project: Project;
+  isSelected: boolean;
+  selectionMode: boolean;
+  onSelect: (id: string) => void;
   onEdit: (project: Project) => void;
   onDelete: (project: Project) => void;
+  onGenerateTasks?: (project: Project) => void;
 }
 
 const statusStyles: Record<ProjectStatus, string> = {
-  planning: 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200',
-  active: 'bg-sky-50 text-sky-700 dark:bg-sky-400/10 dark:text-sky-300',
-  completed: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300',
-  archived: 'bg-amber-50 text-amber-700 dark:bg-amber-400/10 dark:text-amber-300',
+  planning: 'bg-amber-50 text-amber-700 ring-amber-500/20 dark:bg-amber-400/10 dark:text-amber-300 dark:ring-amber-400/25',
+  active: 'bg-sky-50 text-sky-700 ring-sky-500/20 dark:bg-sky-400/10 dark:text-sky-300 dark:ring-sky-400/25',
+  completed: 'bg-emerald-50 text-emerald-700 ring-emerald-500/20 dark:bg-emerald-400/10 dark:text-emerald-300 dark:ring-emerald-400/25',
+  archived: 'bg-slate-100 text-slate-600 ring-slate-500/15 dark:bg-slate-700/60 dark:text-slate-300 dark:ring-slate-400/20',
 };
 
 const statusIcons = {
@@ -25,63 +39,110 @@ const statusIcons = {
   archived: Archive,
 };
 
-export function ProjectCard({ project, onEdit, onDelete }: ProjectCardProps) {
+const cardAccents: Record<ProjectStatus, string> = {
+  planning: 'hover:border-amber-200 dark:hover:border-amber-500/30',
+  active: 'hover:border-sky-200 dark:hover:border-sky-500/30',
+  completed: 'hover:border-emerald-200 dark:hover:border-emerald-500/30',
+  archived: 'hover:border-slate-300 dark:hover:border-slate-600',
+};
+
+export function ProjectCard({ project, isSelected, selectionMode, onSelect, onEdit, onDelete, onGenerateTasks }: ProjectCardProps) {
   const StatusIcon = statusIcons[project.status];
 
   return (
-    <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm transition hover:border-slate-300 hover:shadow-md dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600">
-      <div className="flex items-start justify-between gap-4">
+    <article
+      className={`floating-card tilt-card stagger-item group relative rounded-xl border bg-white p-5 shadow-sm shadow-slate-200/50 dark:bg-slate-800 dark:shadow-black/10 ${
+        isSelected
+          ? 'border-emerald-400 bg-emerald-50/30 ring-2 ring-emerald-400 dark:border-emerald-500 dark:bg-emerald-500/5 dark:ring-emerald-500'
+          : `border-slate-200 hover:-translate-y-px hover:shadow-lg hover:shadow-slate-200/70 dark:border-slate-700/80 dark:hover:shadow-black/25 ${cardAccents[project.status]}`
+      }`}
+    >
+      {/* Checkbox */}
+      <label
+        className={`absolute left-3 top-3 z-10 flex h-5 w-5 cursor-pointer items-center justify-center transition-opacity duration-150 ${
+          selectionMode ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+        }`}
+        aria-label={isSelected ? 'Deselect project' : 'Select project'}
+      >
+        <input
+          type="checkbox"
+          checked={isSelected}
+          onChange={() => onSelect(project.id)}
+          className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+          onClick={(e) => e.stopPropagation()}
+        />
+      </label>
+
+      {/* Header */}
+      <div className={`flex items-start justify-between gap-4 ${selectionMode ? 'pl-7' : ''}`}>
         <div className="min-w-0">
           <span
-            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${statusStyles[project.status]}`}
+            className={`inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset ${statusStyles[project.status]}`}
           >
-            <StatusIcon className="h-3.5 w-3.5" />
+            <StatusIcon className="h-3 w-3" />
             {projectStatusLabels[project.status]}
           </span>
-          <h2 className="mt-3 line-clamp-2 text-base font-semibold text-slate-900 dark:text-slate-100">
+          <h2 className="mt-2.5 line-clamp-2 text-[15px] font-semibold tracking-tight text-slate-900 dark:text-slate-100">
             {project.name}
           </h2>
         </div>
 
-        <div className="flex items-center gap-1">
+        {/* Action buttons — visible on hover */}
+        <div className="flex items-center gap-0.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100">
+          {onGenerateTasks && (
+            <button
+              type="button"
+              onClick={() => onGenerateTasks(project)}
+              className="pressable rounded-lg p-1.5 text-slate-400 hover:bg-violet-50 hover:text-violet-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-violet-500 dark:hover:bg-violet-500/10 dark:hover:text-violet-300"
+              aria-label="Generate tasks with AI"
+              title="Generate tasks with AI"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+            </button>
+          )}
           <button
             type="button"
             onClick={() => onEdit(project)}
-            className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+            className="pressable rounded-lg p-1.5 text-slate-400 hover:bg-sky-50 hover:text-sky-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:hover:bg-sky-500/10 dark:hover:text-sky-300"
             aria-label="Edit project"
             title="Edit"
           >
-            <Pencil className="h-4 w-4" />
+            <Pencil className="h-3.5 w-3.5" />
           </button>
           <button
             type="button"
             onClick={() => onDelete(project)}
-            className="rounded-lg p-2 text-slate-400 transition hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 dark:hover:bg-red-500/10 dark:hover:text-red-300"
+            className="pressable rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-400 dark:hover:bg-red-500/10 dark:hover:text-red-300"
             aria-label="Delete project"
             title="Delete"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-3.5 w-3.5" />
           </button>
         </div>
       </div>
 
-      <p className="mt-3 line-clamp-3 min-h-16 text-sm leading-6 text-slate-600 dark:text-slate-300">
+      {/* Description */}
+      <p className="mt-3 line-clamp-3 min-h-[3.5rem] text-sm leading-relaxed text-slate-600 dark:text-slate-400">
         {project.description || 'No description yet.'}
       </p>
 
-      <div className="mt-5 border-t border-slate-100 pt-4 dark:border-slate-700">
+      {/* GitHub section */}
+      <div className="mt-4 border-t border-slate-100 pt-4 dark:border-slate-700/60">
         {project.githubUrl ? (
-          <a
-            href={project.githubUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 transition hover:text-indigo-700 dark:text-indigo-300 dark:hover:text-indigo-200"
-          >
-            GitHub Repository
-            <ExternalLink className="h-4 w-4" />
-          </a>
+          <div className="rounded-lg border border-slate-200 bg-slate-50/70 p-3 dark:border-slate-700/70 dark:bg-slate-900/30">
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-slate-800 transition-colors duration-150 hover:text-slate-950 dark:text-slate-200 dark:hover:text-white"
+            >
+              GitHub Repository
+              <ExternalLink className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" />
+            </a>
+            <RepositoryPreview githubUrl={project.githubUrl} />
+          </div>
         ) : (
-          <p className="text-sm text-slate-400 dark:text-slate-500">No repository linked</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500">No repository linked.</p>
         )}
       </div>
     </article>

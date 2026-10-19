@@ -70,7 +70,7 @@ export function NoteModal({ note, isOpen, isSaving = false, onClose, onSave }: N
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:bg-slate-700 dark:hover:text-slate-100"
+            className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:hover:bg-slate-700 dark:hover:text-slate-100"
             aria-label="Close note editor"
             title="Close"
           >
@@ -121,7 +121,7 @@ export function NoteModal({ note, isOpen, isSaving = false, onClose, onSave }: N
                 onChange={(event) =>
                   setFields((current) => ({ ...current, isPinned: event.target.checked }))
                 }
-                className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
               />
               Pin note
             </label>
@@ -142,7 +142,7 @@ export function NoteModal({ note, isOpen, isSaving = false, onClose, onSave }: N
               }
               rows={8}
               placeholder="Write the details here..."
-              className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-300 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-100"
+              className="w-full resize-none rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-300 dark:border-slate-600 dark:bg-slate-700/50 dark:text-slate-100"
             />
           </div>
 

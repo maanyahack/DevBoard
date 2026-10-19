@@ -2,7 +2,7 @@
   "name": "devboard",
   "version": "0.1.0",
   "private": true,
-  "description": "DevBoard - a developer productivity platform (monorepo root).",
+  "description": "DevNest - your AI-powered developer workspace (monorepo root).",
   "type": "module",
   "engines": {
     "node": ">=20"
