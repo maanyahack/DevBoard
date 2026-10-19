@@ -21,9 +21,8 @@ export function DashboardLayout() {
       // Don't hijack Ctrl+K when the user is typing in a form field.
       const target = event.target as HTMLElement | null;
       // if user is inside the input area dont activate global search
-      // ?. prevents null error
       if (target?.closest('input, textarea, [contenteditable]')) return;
-      // if cmd or control key is pressed
+
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
         setSearchOpen(true);
